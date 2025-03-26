@@ -1,0 +1,10 @@
+2.- Documento Crear
+
+   -name(nombre que tendrá el documento cuando le aparezca al usuario cuando va firmar)
+   -type(si es pdf seria file y plantilla template)
+   -template_id(Solicitarle a Dionei el template Id que se creo con Ismael)
+   -Sequence es serie de preguntas programadas en la plantilla(si en la plantilla tuviera        una pregunta como nombre del cliente iría key:1,name=opcional,value:nombre del cliente
+
+   Si la respuesta es correcta lo que debemos guardar es el Id del template guardado
+
+
