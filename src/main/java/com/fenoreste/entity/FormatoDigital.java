@@ -5,10 +5,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import javax.persistence.Cacheable;
-import javax.persistence.EmbeddedId;
-import javax.persistence.Entity;
-import javax.persistence.Table;
+import javax.persistence.*;
 import java.io.Serializable;
 
 @Entity
@@ -19,8 +16,7 @@ import java.io.Serializable;
 @Data
 public class FormatoDigital implements Serializable {
 
-    @EmbeddedId
-    private AuxiliarPK auxiliarPK;
+    @Id
     private Integer idkey;
     private String variable;
     private String valor;
