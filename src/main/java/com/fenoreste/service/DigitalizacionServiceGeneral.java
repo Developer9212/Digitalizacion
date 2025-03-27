@@ -32,7 +32,13 @@ public class DigitalizacionServiceGeneral {
     private IAmortizacionService amortizacionService;
 
     @Autowired
+    private IFormatoDigitalService formatoDigitalService;
+
+    @Autowired
     private ApisHttp apisHttp;
+
+
+
 
     private Tabla tabla;
     private TablaPK tablaPK;
@@ -100,6 +106,11 @@ public class DigitalizacionServiceGeneral {
             tabla = tablaService.buscarPorId(tablaPK);
             crearDReqVo.setTemplate_id(tabla.getDato2());
 
+            OpaVo opas = util.opa(opa);
+
+            //Aqui va el array de amortizaciones
+            AuxiliarPK auxPK = new AuxiliarPK(30298, 32644, 5084);
+
             // Crear y agregar cada lista con su respectivo mapa
             sequence.add(Collections.singletonList(createItem(1, "abonos", reca_recortado)));
             sequence.add(Collections.singletonList(createItem(2, "abonos_letra", reca_recortado)));
@@ -108,35 +119,8 @@ public class DigitalizacionServiceGeneral {
             sequence.add(Collections.singletonList(createItem(5, "amort_fecha_ultimo_dd_ml_aaaa", reca_recortado)));
             sequence.add(Collections.singletonList(createItem(6, "amort_fecha_ultimo_dd", reca_recortado)));
             sequence.add(Collections.singletonList(createItem(7, "amort_fecha_ultimo_ml", reca_recortado)));
-            //Aqui va el array de amortizaciones
-            AuxiliarPK auxPK = new AuxiliarPK(30298, 32644, 5084);
-            List<Amortizacion> listaAmortizaciones = amortizacionService.buscarTodasPorId(auxPK);
-            List<Map<String, Object>> amortizacionesArray = new ArrayList<>();
-            for (Amortizacion amortizacion : listaAmortizaciones) {
-                Map<String, Object> amortizacionMap = new HashMap<>();
-                amortizacionMap.put("idamortizacion", amortizacion.getId()); // Reemplaza con los atributos reales
-                amortizacionMap.put("vence", amortizacion.getVence());
-                amortizacionMap.put("abono", amortizacion.getAbono());
-                amortizacionMap.put("io", amortizacion.getIo());
-                amortizacionMap.put("iva", 0.0);
-                amortizacionMap.put("anualidad", 0.0);
-                amortizacionMap.put("total", 0.0);
-                amortizacionMap.put("numero_pago", 0.0);
-                amortizacionMap.put("abono_principal", 0.0);
-                amortizacionMap.put("saldo_insoluto", 0.0);
-                amortizacionMap.put("ios", 0.0);
-                amortizacionMap.put("ivas", 0.0);
-                amortizacionMap.put("monto_total", 0.0);
-                amortizacionesArray.add(amortizacionMap);
-            }
-
-            Map<String, Object> amortizacionData = new HashMap<>();
-            amortizacionData.put("key", 8);
-            amortizacionData.put("name", "amortizaciones");
-            amortizacionData.put("value", amortizacionesArray);
 
 
-            sequence.add(Collections.singletonList(amortizacionData));
             sequence.add(Collections.singletonList(createItem(9, "cat", reca_recortado)));
             sequence.add(Collections.singletonList(createItem(10, "cat_letra", reca_recortado)));
             sequence.add(Collections.singletonList(createItem(11, "color_g1", reca_recortado)));
@@ -272,10 +256,53 @@ public class DigitalizacionServiceGeneral {
             sequence.add(Collections.singletonList(createItem(141, "placas_g1", reca_recortado)));
 
 
+            AuxiliarPK auxiliarPK = new AuxiliarPK(opas.getIdorigenp(),opas.getIdproducto(),opas.getIdauxiliar());
+            List<FormatoDigital> formatos = formatoDigitalService.buscarListaPorId(auxiliarPK);
+
+            List<List<Map<String, Object>>> sequence1 = new ArrayList<>();
+
+            for(int i = 0;i< formatos.size();i++){
+                FormatoDigital formato = formatos.get(i);
+                sequence1.add(Collections.singletonList(createItem(i,formato.getVariable(),formato.getValor())));
+            }
+
+
+            List<Amortizacion> listaAmortizaciones = amortizacionService.buscarTodasPorId(auxPK);
+            List<Map<String, Object>> amortizacionesArray = new ArrayList<>();
+            for (Amortizacion amortizacion : listaAmortizaciones) {
+                Map<String, Object> amortizacionMap = new HashMap<>();
+                amortizacionMap.put("idamortizacion", amortizacion.getId()); // Reemplaza con los atributos reales
+                amortizacionMap.put("vence", amortizacion.getVence());
+                amortizacionMap.put("abono", amortizacion.getAbono());
+                amortizacionMap.put("io", amortizacion.getIo());
+                amortizacionMap.put("iva", 0.0);
+                amortizacionMap.put("anualidad", 0.0);
+                amortizacionMap.put("total", 0.0);
+                amortizacionMap.put("numero_pago", 0.0);
+                amortizacionMap.put("abono_principal", 0.0);
+                amortizacionMap.put("saldo_insoluto", 0.0);
+                amortizacionMap.put("ios", 0.0);
+                amortizacionMap.put("ivas", 0.0);
+                amortizacionMap.put("monto_total", 0.0);
+                amortizacionesArray.add(amortizacionMap);
+            }
+
+            Map<String, Object> amortizacionData = new HashMap<>();
+            amortizacionData.put("key", 8);
+            amortizacionData.put("name", "amortizaciones");
+            amortizacionData.put("value", amortizacionesArray);
+            sequence.add(Collections.singletonList(amortizacionData));
+
+            System.out.println(sequence1);
+
+
+
+
             if (banderaDatos) {
                 crearDReqVo.setType("template");
                 crearDReqVo.setSequence(sequence);
                 resp = apisHttp.crearDocumento(crearDReqVo);
+                System.out.println("Respuesta:"+resp);
 
             } else {
                 resp.setSuccess(false);
