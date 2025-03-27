@@ -6,6 +6,7 @@ import com.fenoreste.entity.Tabla;
 import com.fenoreste.entity.TablaPK;
 import com.fenoreste.model.*;
 import com.fenoreste.service.ITablaService;
+import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import lombok.extern.slf4j.Slf4j;
@@ -195,9 +196,17 @@ public class ApisHttp {
 
             response = client.newCall(request).execute();
             resultado = response.body().string();
-            log.info(":::::::::::Resultado documento crear:::::::::::::::::::" + resultado);
-            creaDocumentoVo = mapper.readValue(resultado, ResCreaDocumentoVo.class);
+            Gson gson = new Gson();
+            JsonObject res = gson.fromJson(resultado, JsonObject.class);
 
+            log.info(":::::::::::Resultado documento crear:::::::::::::::::::" + resultado);
+
+            if(res.get("success").getAsBoolean()) {
+                creaDocumentoVo = mapper.readValue(resultado, ResCreaDocumentoVo.class);
+            }else{
+                System.out.println("Si aqui");
+                creaDocumentoVo.setSuccess(false);
+            }
 
         } catch (Exception e) {
             log.error("::::Error al crear Documento:" + e.getMessage() + "::::::::::::::");
