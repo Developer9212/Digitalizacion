@@ -9,6 +9,6 @@ import java.util.List;
 
 public interface FormatoDigitalDao extends JpaRepository<FormatoDigital, AuxiliarPK> {
 
-    @Query(value = "SELECT * FROM formatos_digitales_datos WHERE idorigenp=?1 AND idproducto=?2 AND idauxiliar=3",nativeQuery = true)
+    @Query(value = "SELECT * FROM formatos_digitales_datos WHERE idorigenp=?1 AND idproducto=?2 AND idauxiliar=?3",nativeQuery = true)
     public List<FormatoDigital>listarFormatoDigital(Integer idorigenp, Integer idproducto,Integer idauxiliar);
 }
