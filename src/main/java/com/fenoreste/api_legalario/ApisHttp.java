@@ -206,6 +206,7 @@ public class ApisHttp {
             }else{
                 System.out.println("Si aqui");
                 creaDocumentoVo.setSuccess(false);
+                creaDocumentoVo.setMessage(res.get("message").getAsString());
             }
 
         } catch (Exception e) {

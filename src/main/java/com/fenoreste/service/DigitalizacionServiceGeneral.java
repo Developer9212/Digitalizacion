@@ -302,6 +302,11 @@ public class DigitalizacionServiceGeneral {
                 crearDReqVo.setType("template");
                 crearDReqVo.setSequence(sequence);
                 resp = apisHttp.crearDocumento(crearDReqVo);
+
+                if(!resp.isSuccess() && resp.getMessage().contains("AUTHORIZATION_ERROR")){
+                    token();
+                    resp = apisHttp.crearDocumento(crearDReqVo);
+                }
                 System.out.println("Respuesta:"+resp);
 
             } else {
