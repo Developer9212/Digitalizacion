@@ -38,8 +38,6 @@ public class DigitalizacionServiceGeneral {
     private ApisHttp apisHttp;
 
 
-
-
     private Tabla tabla;
     private TablaPK tablaPK;
 
@@ -94,10 +92,7 @@ public class DigitalizacionServiceGeneral {
         try {
 
             List<List<Map<String, Object>>> sequence = new ArrayList<>();
-
             boolean banderaDatos = false;
-
-            banderaDatos = true;
             crearDReqVo.setName("Anexo A");
 
             tablaPK = new TablaPK(idTabla, "anexo_a");
@@ -105,66 +100,54 @@ public class DigitalizacionServiceGeneral {
             crearDReqVo.setTemplate_id(tabla.getDato2());
 
             OpaVo opas = util.opa(opa);
-            AuxiliarPK auxiliarPK = new AuxiliarPK(opas.getIdorigenp(),opas.getIdproducto(),opas.getIdauxiliar());
+            AuxiliarPK auxiliarPK = new AuxiliarPK(opas.getIdorigenp(), opas.getIdproducto(), opas.getIdauxiliar());
             List<FormatoDigital> formatos = formatoDigitalService.buscarListaPorId(auxiliarPK);
-
             List<List<Map<String, Object>>> sequence1 = new ArrayList<>();
-            for(int i = 1;i< formatos.size();i++){
+
+            for (int i = 1; i < formatos.size(); i++) {
                 FormatoDigital formato = formatos.get(i);
-                String etiqueta = formato.getEtiqueta().replaceAll("[<>]", "").replaceAll("\\|$", "").replace("|","_").replace("__","_").replace(".sql","");
-                if(!etiqueta.toUpperCase().contains("AMORTIZACIONES")) {
-                    sequence1.add(Collections.singletonList(createItem(i,etiqueta.replace("_+$",""),formato.getValor())));
+                String etiqueta = formato.getEtiqueta().replaceAll("[<>]", "").replaceAll("\\|$", "").replace("|", "_").replace("__", "_").replace(".sql", "");
+                if (!etiqueta.toUpperCase().contains("AMORTIZACIONES")) {
+                    sequence1.add(Collections.singletonList(createItem(i, etiqueta.replace("_+$", ""), formato.getValor())));
+                } else {
+                    List<Amortizacion> listaAmortizaciones = amortizacionService.buscarTodasPorId(auxiliarPK);
+                    List<Map<String, Object>> amortizacionesArray = new ArrayList<>();
+                    for (Amortizacion amortizacion : listaAmortizaciones) {
+                        Map<String, Object> amortizacionMap = new HashMap<>();
+                        amortizacionMap.put("idamortizacion", amortizacion.getId()); // Reemplaza con los atributos reales
+                        amortizacionMap.put("vence", amortizacion.getVence());
+                        amortizacionMap.put("abono", amortizacion.getAbono());
+                        amortizacionMap.put("io", amortizacion.getIo());
+                        amortizacionMap.put("iva", 0.0);
+                        amortizacionMap.put("anualidad", 0.0);
+                        amortizacionMap.put("total", 0.0);
+                        amortizacionMap.put("numero_pago", 0.0);
+                        amortizacionMap.put("abono_principal", 0.0);
+                        amortizacionMap.put("saldo_insoluto", 0.0);
+                        amortizacionMap.put("ios", 0.0);
+                        amortizacionMap.put("ivas", 0.0);
+                        amortizacionMap.put("monto_total", 0.0);
+                        amortizacionesArray.add(amortizacionMap);
+                    }
+
+                    Map<String, Object> amortizacionData = new HashMap<>();
+                    amortizacionData.put("key", 6);
+                    amortizacionData.put("name", "amortizaciones");
+                    amortizacionData.put("value", amortizacionesArray);
+                    sequence1.add(Collections.singletonList(amortizacionData));
                 }
-
+                banderaDatos = true;
             }
-
-
-            List<Amortizacion> listaAmortizaciones = amortizacionService.buscarTodasPorId(auxiliarPK);
-            List<Map<String, Object>> amortizacionesArray = new ArrayList<>();
-            for (Amortizacion amortizacion : listaAmortizaciones) {
-                Map<String, Object> amortizacionMap = new HashMap<>();
-                amortizacionMap.put("idamortizacion", amortizacion.getId()); // Reemplaza con los atributos reales
-                amortizacionMap.put("vence", amortizacion.getVence());
-                amortizacionMap.put("abono", amortizacion.getAbono());
-                amortizacionMap.put("io", amortizacion.getIo());
-                amortizacionMap.put("iva", 0.0);
-                amortizacionMap.put("anualidad", 0.0);
-                amortizacionMap.put("total", 0.0);
-                amortizacionMap.put("numero_pago", 0.0);
-                amortizacionMap.put("abono_principal", 0.0);
-                amortizacionMap.put("saldo_insoluto", 0.0);
-                amortizacionMap.put("ios", 0.0);
-                amortizacionMap.put("ivas", 0.0);
-                amortizacionMap.put("monto_total", 0.0);
-                amortizacionesArray.add(amortizacionMap);
-            }
-
-            Map<String, Object> amortizacionData = new HashMap<>();
-            amortizacionData.put("key", 6);
-            amortizacionData.put("name", "amortizaciones");
-            amortizacionData.put("value", amortizacionesArray);
-            sequence1.add(Collections.singletonList(amortizacionData));
-
-
-            System.out.println(sequence1);
 
             if (banderaDatos) {
                 crearDReqVo.setType("template");
                 crearDReqVo.setSequence(sequence1);
                 resp = apisHttp.crearDocumento(crearDReqVo);
-
-                if(!resp.isSuccess() && resp.getMessage().contains("AUTHORIZATION_ERROR")){
+                if (!resp.isSuccess() && resp.getMessage().contains("AUTHORIZATION_ERROR")) {
                     token();
                     resp = apisHttp.crearDocumento(crearDReqVo);
                 }
-                System.out.println("Respuesta:"+resp);
-
-            } else {
-                resp.setSuccess(false);
-                resp.setMessage("Error al crear Documento");
-
             }
-
         } catch (Exception e) {
             log.error("Error al crear Documento con id:" + crearDReqVo.getTemplate_id() + "," + e.getMessage());
             resp.setMessage("Error al crear Documento");

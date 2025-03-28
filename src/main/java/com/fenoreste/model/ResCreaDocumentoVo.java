@@ -11,7 +11,5 @@ public class ResCreaDocumentoVo implements Serializable {
     private DataCrearDVo data;
     private String message;
 
-
-
     private static final long serialVersionUID = 1L;
 }
