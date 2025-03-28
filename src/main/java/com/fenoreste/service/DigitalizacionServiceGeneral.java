@@ -108,7 +108,7 @@ public class DigitalizacionServiceGeneral {
                 FormatoDigital formato = formatos.get(i);
                 String etiqueta = formato.getEtiqueta().replaceAll("[<>]", "").replaceAll("\\|$", "").replace("|", "_").replace("__", "_").replace(".sql", "");
                 if (!etiqueta.toUpperCase().contains("AMORTIZACIONES")) {
-                    sequence1.add(Collections.singletonList(createItem(i, etiqueta.replace("_+$", ""), formato.getValor())));
+                    sequence1.add(Collections.singletonList(createItem(formato.getIdkey(), etiqueta.replace("_+$", ""), formato.getValor())));
                 } else {
                     List<Amortizacion> listaAmortizaciones = amortizacionService.buscarTodasPorId(auxiliarPK);
                     List<Map<String, Object>> amortizacionesArray = new ArrayList<>();
