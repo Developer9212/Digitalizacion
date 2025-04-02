@@ -164,6 +164,10 @@ public class ApisHttp {
             resultado = response.body().string();
             identidadVoResponse = mapper.readValue(resultado, IdentidadVoResponse.class);
 
+            if(!identidadVoResponse.isSuccess()) {
+                identidadVoResponse.setMessage(identidadVoResponse.getData().get(0).asText());
+            }
+
             log.info(":::::::::::Resultado identidad crear:::::::::::::::::::" + resultado + "," + identidadVoResponse);
         } catch (Exception e) {
             log.error("::::Error al crear identidad:" + e.getMessage() + "::::::::::::::");

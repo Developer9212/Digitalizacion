@@ -12,6 +12,7 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 @Service
 @Slf4j
@@ -131,11 +132,14 @@ public class DigitalizacionServiceGeneral {
                         String ogs = util.ogs(persona.getPk());
                         //Consumimos metodo de crear Identidad
                         IdentidadVoResponse identidadVoResponse = identidadCrear(ogs);
+
+                        ObjectMapper mapper = new ObjectMapper();
+                        JsonNode dataArray = mapper.valueToTree(identidadVoResponse.getData());
+
                         if (identidadVoResponse.isSuccess()) {
                             digitalDoc = digitalDocService.buscarDigitalDocPorId(a.getPk());
-
-                            JsonNode dataArray = identidadVoResponse.getData().get("data");
-                            String id = dataArray.get(0).get("_id").asText();
+                            JsonNode firstElement = dataArray.get(0);
+                            String id = firstElement.get("_id").asText();
                             digitalDoc.setIdidentidad(id);
                             digitalDocService.insertarDigitalDoc(digitalDoc);
                             log.info("::::::::::Se envio la identidad::::::::::::");
