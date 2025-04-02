@@ -1,5 +1,6 @@
 package com.fenoreste.util;
 
+import com.fenoreste.entity.PersonaPK;
 import com.fenoreste.model.OgsVo;
 import com.fenoreste.model.OpaVo;
 import org.springframework.stereotype.Service;
@@ -28,6 +29,17 @@ public class Util {
             ogs.setIdsocio(Integer.parseInt(cadena.substring(8, 14)));
         } catch (Exception e) {
             System.out.println("Error al deserealizar ogs:"+e.getMessage());
+        }
+        return ogs;
+    }
+
+
+    public String ogs(PersonaPK personaPK){
+        String ogs = "";
+        try {
+            ogs = String.format("%06d",personaPK.getIdorigen()) + String.valueOf(personaPK.getIdgrupo())+String.format("%06d",personaPK.getIdsocio());
+        } catch (Exception e) {
+            System.out.println("Error al deserealizar personaPk:"+e.getMessage());
         }
         return ogs;
     }

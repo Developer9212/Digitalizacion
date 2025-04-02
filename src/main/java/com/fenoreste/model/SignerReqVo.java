@@ -5,7 +5,7 @@ import lombok.Data;
 import java.io.Serializable;
 
 @Data
-public class SignerVo implements Serializable {
+public class SignerReqVo implements Serializable {
 
      private String email;
      private String fullname;

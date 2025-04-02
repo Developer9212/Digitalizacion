@@ -1,12 +1,12 @@
 package com.fenoreste.service;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fenoreste.api_legalario.ApisHttp;
 import com.fenoreste.entity.*;
 import com.fenoreste.model.*;
 import com.fenoreste.util.Util;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
@@ -35,6 +35,12 @@ public class DigitalizacionServiceGeneral {
     private IFormatoDigitalService formatoDigitalService;
 
     @Autowired
+    private IDigitalDocService digitalDocService;
+
+    @Autowired
+    private IAuxiliarService auxiliarService;
+
+    @Autowired
     private ApisHttp apisHttp;
 
 
@@ -52,7 +58,7 @@ public class DigitalizacionServiceGeneral {
                 tablaPK = new TablaPK(idTabla, "signer_data");
                 tabla = tablaService.buscarPorId(tablaPK);
 
-                SignerVo signer = new SignerVo();
+                SignerReqVo signer = new SignerReqVo();
                 signer.setEmail(persona.getEmail());
                 signer.setPhone(persona.getCelular());
                 signer.setFullname(persona.getNombre() + " " + persona.getAppaterno() + " " + persona.getAppaterno());
@@ -62,7 +68,7 @@ public class DigitalizacionServiceGeneral {
                 signer.setOrganization_id(tabla.getDato2());
 
                 SignersVoReq signersVoReq = new SignersVoReq();
-                List<SignerVo> lista = new ArrayList<>();
+                List<SignerReqVo> lista = new ArrayList<>();
                 lista.add(signer);
                 signersVoReq.setSigners(lista);
 
@@ -73,6 +79,10 @@ public class DigitalizacionServiceGeneral {
                 if (tabla != null) {
                     token();
                     identidadVoResponse = apisHttp.identidadCrear(signersVoReq);
+                    if (!identidadVoResponse.isSuccess() && identidadVoResponse.getMessage().contains("AUTHORIZATION_ERROR")) {
+                        token();
+                        identidadVoResponse = apisHttp.identidadCrear(signersVoReq);
+                    }
                 } else {
                     log.warn(":::::::::::::::::No existe parametrizacion token::::::::::::");
                 }
@@ -91,6 +101,56 @@ public class DigitalizacionServiceGeneral {
         CrearDReqVo crearDReqVo = new CrearDReqVo();
         try {
 
+            OpaVo opas = util.opa(opa);
+            AuxiliarPK auxiliarPK = new AuxiliarPK(opas.getIdorigenp(), opas.getIdproducto(), opas.getIdauxiliar());
+
+            //Verificamos que el folio exista en auxiliares y que este en estatus capturado
+            Auxiliar a = auxiliarService.buscarPorId(auxiliarPK);
+            if (a != null) {
+                if (a.getEstatus() == 0) {
+                    List<List<Map<String, Object>>> sequence1 = new ArrayList<>();
+                    //Si esta el auxiliar ahora buscamos que esten las variables listas para el contrato
+                    List<FormatoDigital> formatos = formatoDigitalService.buscarListaPorId(auxiliarPK);
+                    if (formatos.size() > 0) {
+                        //Ya nos aseguramos que ya esten las variables en la tabla ahora si creamos la identidad
+                        //Antes llenamos la tabla para preparar respuestas de legalario
+                        DigitalDoc digitalDoc = new DigitalDoc();
+                        digitalDoc.setAuxiliarPK(a.getPk());
+                        digitalDoc.setFecha_captura(new Date());
+                        digitalDoc.setStatus("Pendiente");
+                        digitalDoc.setOk_identidad(false);
+                        digitalDoc.setFirmado(false);
+
+                        digitalDocService.insertarDigitalDoc(digitalDoc);
+
+                        //Una ves guardado el registros enviamos la creacion de identidad
+                        Persona p = new Persona();
+                        PersonaPK personaPK = new PersonaPK(a.getIdorigen(), a.getIdgrupo(), a.getIdsocio());
+                        Persona persona = personaService.buscarPorId(personaPK);
+
+                        String ogs = util.ogs(persona.getPk());
+                        //Consumimos metodo de crear Identidad
+                        IdentidadVoResponse identidadVoResponse = identidadCrear(ogs);
+                        if (identidadVoResponse.isSuccess()) {
+                            digitalDoc = digitalDocService.buscarDigitalDocPorId(a.getPk());
+
+                            JsonNode dataArray = identidadVoResponse.getData().get("data");
+                            String id = dataArray.get(0).get("_id").asText();
+                            digitalDoc.setIdidentidad(id);
+                            digitalDocService.insertarDigitalDoc(digitalDoc);
+                            log.info("::::::::::Se envio la identidad::::::::::::");
+                        } else {
+                            log.error(":::::::::::::::::::::" + identidadVoResponse.getMessage() + ":::::::::::::::::::");
+                        }
+
+                    }
+                } else {
+                    log.info("::::::::::::::Estatus folio debe ser capturado:::::::::::::");
+                }
+            } else {
+                log.info(":::::::::::::::No existe folio capturado::::::::::::::::");
+            }
+
             List<List<Map<String, Object>>> sequence = new ArrayList<>();
             boolean banderaDatos = false;
             crearDReqVo.setName("Anexo A");
@@ -99,12 +159,8 @@ public class DigitalizacionServiceGeneral {
             tabla = tablaService.buscarPorId(tablaPK);
             crearDReqVo.setTemplate_id(tabla.getDato2());
 
-            OpaVo opas = util.opa(opa);
-            AuxiliarPK auxiliarPK = new AuxiliarPK(opas.getIdorigenp(), opas.getIdproducto(), opas.getIdauxiliar());
-            List<FormatoDigital> formatos = formatoDigitalService.buscarListaPorId(auxiliarPK);
-            List<List<Map<String, Object>>> sequence1 = new ArrayList<>();
 
-            for (int i = 1; i < formatos.size(); i++) {
+            /*for (int i = 0; i < formatos.size(); i++) {
                 FormatoDigital formato = formatos.get(i);
                 String etiqueta = formato.getEtiqueta().replaceAll("[<>]", "").replaceAll("\\|$", "").replace("|", "_").replace("__", "_").replace(".sql", "");
                 if (!etiqueta.toUpperCase().contains("AMORTIZACIONES")) {
@@ -131,7 +187,7 @@ public class DigitalizacionServiceGeneral {
                     }
 
                     Map<String, Object> amortizacionData = new HashMap<>();
-                    amortizacionData.put("key", 6);
+                    amortizacionData.put("key", formato.getIdkey());
                     amortizacionData.put("name", "amortizaciones");
                     amortizacionData.put("value", amortizacionesArray);
                     sequence1.add(Collections.singletonList(amortizacionData));
@@ -147,12 +203,41 @@ public class DigitalizacionServiceGeneral {
                     token();
                     resp = apisHttp.crearDocumento(crearDReqVo);
                 }
-            }
+            }*/
         } catch (Exception e) {
             log.error("Error al crear Documento con id:" + crearDReqVo.getTemplate_id() + "," + e.getMessage());
             resp.setMessage("Error al crear Documento");
         }
         return resp;
+    }
+
+
+    public ConfirmaIdentidadVo confirmaIdentidadVo(ConfirmaIdentidadReqVo confirmaIdentidadReqVo) {
+        ConfirmaIdentidadVo confirmaIdentidadVo = new ConfirmaIdentidadVo();
+        try {
+           DigitalDoc digitalDoc = digitalDocService.buscaPorIdIdentidad(confirmaIdentidadReqVo.getIdidentidad());
+           if(digitalDoc != null) {
+               log.info("Se encuentra la identidad");
+               digitalDoc.setOk_identidad(true);
+               digitalDocService.insertarDigitalDoc(digitalDoc);
+
+           }
+        } catch (Exception e) {
+            log.error("::::::::::::Error al confirmar identidad:::::::::::::" + e.getMessage());
+        }
+        return confirmaIdentidadVo;
+    }
+
+
+    public ResSignersVo enviarFirmantes(String opa) {
+
+        ResSignersVo resSignersVo = new ResSignersVo();
+        try {
+
+        } catch (Exception e) {
+
+        }
+        return resSignersVo;
     }
 
 

@@ -8,7 +8,7 @@ import java.util.List;
 @Data
 public class SignersVoReq implements Serializable {
 
-    private List<SignerVo> signers;
+    private List<SignerReqVo> signers;
 
     private static final long serialVersionUID = 1L;
 }

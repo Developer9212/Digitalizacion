@@ -35,7 +35,8 @@ public class ApisHttp {
     private String pathLoginS = "auth/login";
     private String pathTokenS = "auth/token";
     private String pathIdentidadS = "v2/identities";
-    private String pathCreadDoucmentoS = "v2/documents";
+    private String pathCrearDocumentoS = "v2/documents";
+    private String pathEnviarFirmantes = "v2/signers";
 
     OkHttpClient client = null;
     MediaType mediaType = null;
@@ -186,7 +187,7 @@ public class ApisHttp {
             log.info("Json a enviar es:"+json);
             mediaType = MediaType.parse("application/application/json");
             body = RequestBody.create(mediaType, json);
-            String url = basePathS + pathCreadDoucmentoS;
+            String url = basePathS + pathCrearDocumentoS;
             request = new Request.Builder()
                     .url(url)
                     .method("POST", body)
@@ -214,4 +215,46 @@ public class ApisHttp {
         }
         return creaDocumentoVo;
     }
+
+    public ResSignersVo firmantes(SignersVoReq signersVoReq) {
+        ResSignersVo resSignersVo = new ResSignersVo();
+
+        try {
+            sslUtil.disableSSLCertificateChecking();
+            client = new OkHttpClient.Builder()
+                    .connectTimeout(20, java.util.concurrent.TimeUnit.SECONDS) // Tiempo de espera para establecer la conexión
+                    .readTimeout(20, java.util.concurrent.TimeUnit.SECONDS)    // Tiempo de espera para la lectura de datos
+                    .build();
+            String json = mapper.writeValueAsString(resSignersVo);
+
+            log.info("Json signers a enviar es:"+json);
+            mediaType = MediaType.parse("application/application/json");
+            body = RequestBody.create(mediaType, json);
+            String url = basePathS + pathEnviarFirmantes;
+            request = new Request.Builder()
+                    .url(url)
+                    .method("POST", body)
+                    .addHeader("Content-Type", "application/json")
+                    .addHeader("Authorization", "Bearer " + tabla.getDato2())
+                    .build();
+
+            response = client.newCall(request).execute();
+            String resultado = response.body().string();
+            Gson gson = new Gson();
+            JsonObject res = gson.fromJson(resultado, JsonObject.class);
+            log.info(":::::::::::Resultado signers:::::::::::::::::::" + resultado);
+
+            if(res.get("success").getAsBoolean()) {
+                resSignersVo = mapper.readValue(resultado, ResSignersVo.class);
+            }else{
+                resSignersVo.setSuccess(false);
+                resSignersVo.setMessage(res.get("message").getAsString());
+            }
+        }catch (Exception e) {
+             log.error(":::::::::::::::::::::::::::Error al enviar a firmantes::::::::::::::::::::::::");
+        }
+
+        return resSignersVo;
+    }
+
 }

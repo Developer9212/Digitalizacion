@@ -22,4 +22,6 @@ public class FormatoDigitalServiceImpl implements IFormatoDigitalService {
     public List<FormatoDigital> buscarListaPorId(AuxiliarPK auxiliarPK) {
         return formatoDigitalDao.listarFormatoDigital(auxiliarPK.getIdorigenp(),auxiliarPK.getIdproducto(),auxiliarPK.getIdauxiliar());
     }
+
+
 }
