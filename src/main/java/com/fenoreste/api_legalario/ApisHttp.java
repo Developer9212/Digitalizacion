@@ -220,9 +220,8 @@ public class ApisHttp {
         return creaDocumentoVo;
     }
 
-    public ResSignersVo firmantes(SignersVoReq signersVoReq) {
+    public ResSignersVo firmantes(SignersReqVo signersVoReq) {
         ResSignersVo resSignersVo = new ResSignersVo();
-
         try {
             sslUtil.disableSSLCertificateChecking();
             client = new OkHttpClient.Builder()

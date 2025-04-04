@@ -9,9 +9,11 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.text.Normalizer;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
+
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 @Service
@@ -99,7 +101,6 @@ public class DigitalizacionServiceGeneral {
 
     public ResCreaDocumentoVo resCreaDocumentoVo(String opa) {
         ResCreaDocumentoVo resp = new ResCreaDocumentoVo();
-        CrearDReqVo crearDReqVo = new CrearDReqVo();
         try {
 
             OpaVo opas = util.opa(opa);
@@ -143,10 +144,11 @@ public class DigitalizacionServiceGeneral {
                             digitalDoc.setIdidentidad(id);
                             digitalDocService.insertarDigitalDoc(digitalDoc);
                             log.info("::::::::::Se envio la identidad::::::::::::");
+                            resp.setSuccess(true);
+                            resp.setMessage("Identidad creada con exito");
                         } else {
                             log.error(":::::::::::::::::::::" + identidadVoResponse.getMessage() + ":::::::::::::::::::");
                         }
-
                     }
                 } else {
                     log.info("::::::::::::::Estatus folio debe ser capturado:::::::::::::");
@@ -155,62 +157,10 @@ public class DigitalizacionServiceGeneral {
                 log.info(":::::::::::::::No existe folio capturado::::::::::::::::");
             }
 
-            List<List<Map<String, Object>>> sequence = new ArrayList<>();
-            boolean banderaDatos = false;
-            crearDReqVo.setName("Anexo A");
 
-            tablaPK = new TablaPK(idTabla, "anexo_a");
-            tabla = tablaService.buscarPorId(tablaPK);
-            crearDReqVo.setTemplate_id(tabla.getDato2());
-
-
-            /*for (int i = 0; i < formatos.size(); i++) {
-                FormatoDigital formato = formatos.get(i);
-                String etiqueta = formato.getEtiqueta().replaceAll("[<>]", "").replaceAll("\\|$", "").replace("|", "_").replace("__", "_").replace(".sql", "");
-                if (!etiqueta.toUpperCase().contains("AMORTIZACIONES")) {
-                    sequence1.add(Collections.singletonList(createItem(formato.getIdkey(), etiqueta.replace("_+$", ""), formato.getValor())));
-                } else {
-                    List<Amortizacion> listaAmortizaciones = amortizacionService.buscarTodasPorId(auxiliarPK);
-                    List<Map<String, Object>> amortizacionesArray = new ArrayList<>();
-                    for (Amortizacion amortizacion : listaAmortizaciones) {
-                        Map<String, Object> amortizacionMap = new HashMap<>();
-                        amortizacionMap.put("idamortizacion", amortizacion.getId()); // Reemplaza con los atributos reales
-                        amortizacionMap.put("vence", amortizacion.getVence());
-                        amortizacionMap.put("abono", amortizacion.getAbono());
-                        amortizacionMap.put("io", amortizacion.getIo());
-                        amortizacionMap.put("iva", 0.0);
-                        amortizacionMap.put("anualidad", 0.0);
-                        amortizacionMap.put("total", 0.0);
-                        amortizacionMap.put("numero_pago", 0.0);
-                        amortizacionMap.put("abono_principal", 0.0);
-                        amortizacionMap.put("saldo_insoluto", 0.0);
-                        amortizacionMap.put("ios", 0.0);
-                        amortizacionMap.put("ivas", 0.0);
-                        amortizacionMap.put("monto_total", 0.0);
-                        amortizacionesArray.add(amortizacionMap);
-                    }
-
-                    Map<String, Object> amortizacionData = new HashMap<>();
-                    amortizacionData.put("key", formato.getIdkey());
-                    amortizacionData.put("name", "amortizaciones");
-                    amortizacionData.put("value", amortizacionesArray);
-                    sequence1.add(Collections.singletonList(amortizacionData));
-                }
-                banderaDatos = true;
-            }
-
-            if (banderaDatos) {
-                crearDReqVo.setType("template");
-                crearDReqVo.setSequence(sequence1);
-                resp = apisHttp.crearDocumento(crearDReqVo);
-                if (!resp.isSuccess() && resp.getMessage().contains("AUTHORIZATION_ERROR")) {
-                    token();
-                    resp = apisHttp.crearDocumento(crearDReqVo);
-                }
-            }*/
         } catch (Exception e) {
-            log.error("Error al crear Documento con id:" + crearDReqVo.getTemplate_id() + "," + e.getMessage());
-            resp.setMessage("Error al crear Documento");
+            log.error("Error al crear Documento para opa:" + opa + "," + e.getMessage() + ":::::::::::::::");
+            resp.setMessage("Error al crear Documento:" + e.getMessage());
         }
         return resp;
     }
@@ -219,13 +169,79 @@ public class DigitalizacionServiceGeneral {
     public ConfirmaIdentidadVo confirmaIdentidadVo(ConfirmaIdentidadReqVo confirmaIdentidadReqVo) {
         ConfirmaIdentidadVo confirmaIdentidadVo = new ConfirmaIdentidadVo();
         try {
-           DigitalDoc digitalDoc = digitalDocService.buscaPorIdIdentidad(confirmaIdentidadReqVo.getIdidentidad());
-           if(digitalDoc != null) {
-               log.info("Se encuentra la identidad");
-               digitalDoc.setOk_identidad(true);
-               digitalDocService.insertarDigitalDoc(digitalDoc);
 
-           }
+            CrearDReqVo crearDReqVo = new CrearDReqVo();
+            DigitalDoc digitalDoc = digitalDocService.buscaPorIdIdentidad(confirmaIdentidadReqVo.getIdidentidad());
+
+            if (digitalDoc != null) {
+                log.info("Se encuentra la identidad");
+                digitalDoc.setOk_identidad(true);
+                digitalDocService.insertarDigitalDoc(digitalDoc);
+                //Una ves guardada la identidad vamos a enviar las variables para el documento
+                List<FormatoDigital> formatos = formatoDigitalService.buscarListaPorId(digitalDoc.getAuxiliarPK());
+
+                List<List<Map<String, Object>>> sequence = new ArrayList<>();
+                boolean banderaDatos = false;
+                //crearDReqVo.setName("Anexo A");
+
+                tablaPK = new TablaPK(idTabla, "anexo_a");
+                tabla = tablaService.buscarPorId(tablaPK);
+                crearDReqVo.setTemplate_id(tabla.getDato2());
+
+
+                for (int i = 0; i < formatos.size(); i++) {
+                    FormatoDigital formato = formatos.get(i);
+                    String etiqueta = formato.getEtiqueta().replaceAll("[<>]", "").replaceAll("\\|$", "").replace("|", "_").replace("__", "_").replace(".sql", "");
+                    if (!etiqueta.toUpperCase().contains("AMORTIZACIONES")) {
+                        sequence.add(Collections.singletonList(createItem(formato.getIdkey(), etiqueta.replace("_+$", ""), formato.getValor())));
+                    } else {
+                        List<Amortizacion> listaAmortizaciones = amortizacionService.buscarTodasPorId(digitalDoc.getAuxiliarPK());
+                        List<Map<String, Object>> amortizacionesArray = new ArrayList<>();
+                        for (Amortizacion amortizacion : listaAmortizaciones) {
+                            Map<String, Object> amortizacionMap = new HashMap<>();
+                            amortizacionMap.put("idamortizacion", amortizacion.getId()); // Reemplaza con los atributos reales
+                            amortizacionMap.put("vence", amortizacion.getVence());
+                            amortizacionMap.put("abono", amortizacion.getAbono());
+                            amortizacionMap.put("io", amortizacion.getIo());
+                            amortizacionMap.put("iva", 0.0);
+                            amortizacionMap.put("anualidad", 0.0);
+                            amortizacionMap.put("total", 0.0);
+                            amortizacionMap.put("numero_pago", 0.0);
+                            amortizacionMap.put("abono_principal", 0.0);
+                            amortizacionMap.put("saldo_insoluto", 0.0);
+                            amortizacionMap.put("ios", 0.0);
+                            amortizacionMap.put("ivas", 0.0);
+                            amortizacionMap.put("monto_total", 0.0);
+                            amortizacionesArray.add(amortizacionMap);
+                        }
+
+                        Map<String, Object> amortizacionData = new HashMap<>();
+                        amortizacionData.put("key", formato.getIdkey());
+                        amortizacionData.put("name", "amortizaciones");
+                        amortizacionData.put("value", amortizacionesArray);
+                        sequence.add(Collections.singletonList(amortizacionData));
+                    }
+                    banderaDatos = true;
+                }
+
+                if (banderaDatos) {
+                    crearDReqVo.setType("template");
+                    crearDReqVo.setSequence(sequence);
+                    ResCreaDocumentoVo resp = apisHttp.crearDocumento(crearDReqVo);
+                    if (!resp.isSuccess() && resp.getMessage().contains("AUTHORIZATION_ERROR")) {
+                        token();
+                        resp = apisHttp.crearDocumento(crearDReqVo);
+                    }
+
+                    log.info(":::::::::::::::::::::Se creo el documento::::::::::::::::::");
+                    //Una ves creado el documento actualizamos la tabla y enviamos a los firmantes
+                    digitalDoc.setIddocto_creado(resp.getData().getId());
+                    digitalDoc.setOk_docto_creado(true);
+                    digitalDocService.insertarDigitalDoc(digitalDoc);
+
+
+                }
+            }
         } catch (Exception e) {
             log.error("::::::::::::Error al confirmar identidad:::::::::::::" + e.getMessage());
         }
@@ -234,12 +250,37 @@ public class DigitalizacionServiceGeneral {
 
 
     public ResSignersVo enviarFirmantes(String opa) {
-
         ResSignersVo resSignersVo = new ResSignersVo();
         try {
+            OpaVo opaVo = util.opa(opa);
+            AuxiliarPK auxiliarPK = new AuxiliarPK(opaVo.getIdorigenp(), opaVo.getIdproducto(), opaVo.getIdauxiliar());
+            DigitalDoc digitalDoc = digitalDocService.buscarDigitalDocPorId(auxiliarPK);
+            if (digitalDoc != null) {
+                if (!digitalDoc.isFirmado()) {
+                    SignersReqVo signersReqVo = new SignersReqVo();
+                    signersReqVo.setDocument_id(digitalDoc.getIddocto_creado());
+                    signersReqVo.setWorkflow(true);
+                    signersReqVo.setUse_whatsapp(false);
+                    List<Signer> signers = new ArrayList<>();
+
+                    List<FormatoDigital> formatos = formatoDigitalService.buscarListaPorId(auxiliarPK);
+                    for(int i=0;i<formatos.size();i++){
+                        FormatoDigital formato = formatos.get(i);
+
+                    }
+
+
+
+
+                } else {
+                    log.info(":::::::::::::El documento ya esta firmado::::::::::::::");
+                }
+            } else {
+                log.info("::::::::::::Es el documento no existe::::::::::::::");
+            }
 
         } catch (Exception e) {
-
+            log.error(":::::::::::::Sucedio un error al enviar a firmar:::::::::"+e.getMessage());
         }
         return resSignersVo;
     }
