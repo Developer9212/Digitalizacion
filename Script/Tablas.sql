@@ -10,5 +10,5 @@ DELETE FROM tablas WHERE idtabla='digitalizacion' AND idelemento ='token';
 INSERT INTO tablas(idtabla,idelemento,dato2,dato3)VALUES('digitalizacion','token','fasasfasfsafasfsfasf','01/02/1970');
 
 DELETE FROM TABLAS WHERE idtabla='digitalizacion' AND idelemento ='anexo_a';
-INSERT INTO TABLAS(idtabla,idelemento,dato2)VALUES('digitalizacion','anexo_a','67b659c445373233a05a87c7');
+INSERT INTO TABLAS(idtabla,idelemento,dato2)VALUES('digitalizacion','anexo_a','67eadea8c046bd05d01058b2');
 

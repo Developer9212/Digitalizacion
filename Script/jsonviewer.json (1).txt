@@ -1,0 +1,135 @@
+{
+  "type": "document.sign",
+  "document": {
+    "id": "67acdabd478e530443138953",
+    "name": "contrato zorro lt 04 chrystian enriquez",
+    "sequence": [],
+    "created_at": {
+      "date": "2025-02-12 17:30:37.000000",
+      "timezone_type": 3,
+      "timezone": "UTC"
+    },
+    "updated_at": {
+      "date": "2025-02-17 19:21:28.000000",
+      "timezone_type": 3,
+      "timezone": "UTC"
+    },
+    "completed": true,
+    "progress": 100,
+    "ready_to_sign": true,
+    "signature_progress": 100
+  },
+  "signers": [
+    {
+      "id": "67acdc9cf9dce10c636a25b3",
+      "user_documents_organization_id": "67acdabd478e530443138953",
+      "fullname": "CHRYSTIAN HIRAM ENRIQUEZ GARCIA",
+      "email": "chryshiram@gmail.com",
+      "phone": "No proporcionado",
+      "status": "confirmed",
+      "updated_at": {
+        "date": "2025-02-12 18:07:36.000000",
+        "timezone_type": 3,
+        "timezone": "UTC"
+      },
+      "created_at": {
+        "date": "2025-02-12 17:38:36.000000",
+        "timezone_type": 3,
+        "timezone": "UTC"
+      }
+    },
+    {
+      "id": "67acdc9ff9dce10c636a25b8",
+      "user_documents_organization_id": "67acdabd478e530443138953",
+      "fullname": "ERNESTO VILLASEÑOR PEREZ",
+      "email": "ernesto.villasenor@altozano.com.mx",
+      "phone": "",
+      "status": "confirmed",
+      "updated_at": {
+        "date": "2025-02-14 17:33:11.000000",
+        "timezone_type": 3,
+        "timezone": "UTC"
+      },
+      "created_at": {
+        "date": "2025-02-12 17:38:39.000000",
+        "timezone_type": 3,
+        "timezone": "UTC"
+      }
+    },
+    {
+      "id": "67acdc9ff9dce10c636a25b7",
+      "user_documents_organization_id": "67acdabd478e530443138953",
+      "fullname": "LESLIE MELISSA GUIZAR TOVAR",
+      "email": "leslie.guizar@altozano.com.mx",
+      "phone": "No proporcionado",
+      "status": "confirmed",
+      "updated_at": {
+        "date": "2025-02-13 23:58:38.000000",
+        "timezone_type": 3,
+        "timezone": "UTC"
+      },
+      "created_at": {
+        "date": "2025-02-12 17:38:39.000000",
+        "timezone_type": 3,
+        "timezone": "UTC"
+      }
+    },
+    {
+      "id": "67acdc9ff9dce10c636a25b5",
+      "user_documents_organization_id": "67acdabd478e530443138953",
+      "fullname": "AMALIA LORENIA OCHOA MENDIVIL",
+      "email": "lorenia.ochoa@altozano.com.mx",
+      "phone": "No proporcionado",
+      "status": "confirmed",
+      "updated_at": {
+        "date": "2025-02-12 23:27:20.000000",
+        "timezone_type": 3,
+        "timezone": "UTC"
+      },
+      "created_at": {
+        "date": "2025-02-12 17:38:39.000000",
+        "timezone_type": 3,
+        "timezone": "UTC"
+      }
+    },
+    {
+      "id": "67acdc9ff9dce10c636a25b6",
+      "user_documents_organization_id": "67acdabd478e530443138953",
+      "fullname": "LUIS ALFONSO AVILA SIERRA",
+      "email": "luis.avila@altozano.com.mx",
+      "phone": "No proporcionado",
+      "status": "confirmed",
+      "updated_at": {
+        "date": "2025-02-13 00:28:48.000000",
+        "timezone_type": 3,
+        "timezone": "UTC"
+      },
+      "created_at": {
+        "date": "2025-02-12 17:38:39.000000",
+        "timezone_type": 3,
+        "timezone": "UTC"
+      }
+    },
+    {
+      "id": "67acdc9ff9dce10c636a25b4",
+      "user_documents_organization_id": "67acdabd478e530443138953",
+      "fullname": "LUIS ARMANDO CAMPA BERMUDEZ",
+      "email": "luis.campa@altozano.com.mx",
+      "phone": "No proporcionado",
+      "status": "confirmed",
+      "updated_at": {
+        "date": "2025-02-12 19:01:22.000000",
+        "timezone_type": 3,
+        "timezone": "UTC"
+      },
+      "created_at": {
+        "date": "2025-02-12 17:38:39.000000",
+        "timezone_type": 3,
+        "timezone": "UTC"
+      }
+    }
+  ],
+  "attachments": [],
+  "zip": "base64",
+  "file_hash": "ca7349a7279352108e413bfe181d7ecb7eda7878528d72d8977497bd4bc0b629"
+}
