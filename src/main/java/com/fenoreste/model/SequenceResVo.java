@@ -1,7 +1,14 @@
 package com.fenoreste.model;
 
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
 import java.io.Serializable;
 
+@Data
+@AllArgsConstructor
+@NoArgsConstructor
 public class SequenceResVo implements Serializable {
 
     private Integer question;

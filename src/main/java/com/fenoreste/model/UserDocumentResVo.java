@@ -1,8 +1,15 @@
 package com.fenoreste.model;
 
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
 import java.io.Serializable;
 import java.util.List;
 
+@AllArgsConstructor
+@NoArgsConstructor
+@Data
 public class UserDocumentResVo implements Serializable {
 
     private String id;

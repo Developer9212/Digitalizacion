@@ -169,7 +169,6 @@ public class DigitalizacionServiceGeneral {
     public ConfirmaIdentidadVo confirmaIdentidadVo(ConfirmaIdentidadReqVo confirmaIdentidadReqVo) {
         ConfirmaIdentidadVo confirmaIdentidadVo = new ConfirmaIdentidadVo();
         try {
-
             CrearDReqVo crearDReqVo = new CrearDReqVo();
             DigitalDoc digitalDoc = digitalDocService.buscaPorIdIdentidad(confirmaIdentidadReqVo.getIdidentidad());
 
@@ -183,11 +182,9 @@ public class DigitalizacionServiceGeneral {
                 List<List<Map<String, Object>>> sequence = new ArrayList<>();
                 boolean banderaDatos = false;
                 //crearDReqVo.setName("Anexo A");
-
                 tablaPK = new TablaPK(idTabla, "anexo_a");
                 tabla = tablaService.buscarPorId(tablaPK);
                 crearDReqVo.setTemplate_id(tabla.getDato2());
-
 
                 for (int i = 0; i < formatos.size(); i++) {
                     FormatoDigital formato = formatos.get(i);
@@ -263,13 +260,69 @@ public class DigitalizacionServiceGeneral {
                     signersReqVo.setUse_whatsapp(false);
                     List<Signer> signers = new ArrayList<>();
 
+                    Auxiliar a = auxiliarService.buscarPorId(auxiliarPK);
+                    PersonaPK personaPK = new PersonaPK(a.getIdorigen(),a.getIdgrupo(),a.getIdsocio());
+                    Persona persona = personaService.buscarPorId(personaPK);
+
                     List<FormatoDigital> formatos = formatoDigitalService.buscarListaPorId(auxiliarPK);
+
+                    String correoSocio = persona.getEmail();
+                    String ogsAval1 = "";
+                    String ogsAval2 = "";
+                    String ogsCodeudor = "";
+
                     for(int i=0;i<formatos.size();i++){
                         FormatoDigital formato = formatos.get(i);
+                        //Vamos a enviar a firmantes verificamos que personas debemos enviar
+                        if(formato.getEtiqueta().contains("ogs_codeudor") && !formato.getValor().isEmpty()){
+                            ogsCodeudor = formato.getValor().replace("-","");
+                            log.info("Ogs codeudor: "+ogsCodeudor);
+                        }
 
+                        if(formato.getEtiqueta().contains("ogs_aval1") && !formato.getValor().isEmpty()){
+                            ogsAval1 = formato.getValor().replace("-","");
+                            log.info("Ogs aval1: "+ogsAval1);
+                        }
+
+                        if(formato.getEtiqueta().contains("ogs_aval2") && !formato.getValor().isEmpty()){
+                            ogsAval2 = formato.getValor().replace("-","");
+                            log.info("Ogs aval2: "+ogsAval2);
+                        }
                     }
 
+                    Signer signer = new Signer();
 
+                    OgsVo ogsVo = new OgsVo();
+                    if(!ogsCodeudor.isEmpty()){
+                        ogsVo = util.ogs(ogsCodeudor);
+                        personaPK = new PersonaPK(ogsVo.getIdorigen(),ogsVo.getIdgrupo(),ogsVo.getIdsocio());
+                        persona = personaService.buscarPorId(personaPK);
+                        signer.setEmail(persona.getEmail());
+                        signer.setFullname(persona.getNombre() +" " + persona.getAppaterno() +" " +persona.getApmaterno());
+                        signer.setRole("FIRMANTE");
+                        signer.setType("FIRMA");
+                        signers.add(signer);
+                    } else if(!ogsAval1.isEmpty()){
+                        ogsVo = util.ogs(ogsAval1);
+                        personaPK = new PersonaPK(ogsVo.getIdorigen(),ogsVo.getIdgrupo(),ogsVo.getIdsocio());
+                        persona = personaService.buscarPorId(personaPK);
+                        signer.setEmail(persona.getEmail());
+                        signer.setFullname(persona.getNombre() +" " + persona.getAppaterno() +" " +persona.getApmaterno());
+                        signer.setRole("FIRMANTE");
+                        signer.setType("FIRMA");
+                        signers.add(signer);
+                    } else if (!ogsAval2.isEmpty()) {
+                        ogsVo = util.ogs(ogsAval2);
+                        personaPK = new PersonaPK(ogsVo.getIdorigen(),ogsVo.getIdgrupo(),ogsVo.getIdsocio());
+                        persona = personaService.buscarPorId(personaPK);
+                        signer.setEmail(persona.getEmail());
+                        signer.setFullname(persona.getNombre() +" " + persona.getAppaterno() +" " +persona.getApmaterno());
+                        signer.setRole("FIRMANTE");
+                        signer.setType("FIRMA");
+                        signers.add(signer);
+                    }
+
+                    ResSignersVo signerResVo = apisHttp.firmantes(signersReqVo);
 
 
                 } else {

@@ -12,7 +12,7 @@ import java.io.Serializable;
 public class ResSignersVo implements Serializable {
 
     private boolean success;
-    private DataResSignersVo dataResSignersVo;
+    private DataResSignersVo dataResSignersVoss;
     private String message;
 
     private static final long serialVersionUID = 1L;
