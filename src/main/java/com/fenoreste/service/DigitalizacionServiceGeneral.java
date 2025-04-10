@@ -145,7 +145,7 @@ public class DigitalizacionServiceGeneral {
                             digitalDocService.insertarDigitalDoc(digitalDoc);
                             log.info("::::::::::Se envio la identidad::::::::::::");
                             resp.setSuccess(true);
-                            resp.setMessage("Identidad creada con exito");
+                            resp.setMessage("Identidad creada con exito:"+id);
                         } else {
                             log.error(":::::::::::::::::::::" + identidadVoResponse.getMessage() + ":::::::::::::::::::");
                         }
@@ -233,11 +233,16 @@ public class DigitalizacionServiceGeneral {
 
                     log.info(":::::::::::::::::::::Se creo el documento::::::::::::::::::");
                     //Una ves creado el documento actualizamos la tabla y enviamos a los firmantes
-                    digitalDoc.setIddocto_creado(resp.getData().getId());
-                    digitalDoc.setOk_docto_creado(true);
-                    digitalDocService.insertarDigitalDoc(digitalDoc);
+                    if(!resp.isSuccess()) {
+                        digitalDoc.setIddocto_creado(resp.getData().getId());
+                        digitalDoc.setOk_docto_creado(true);
+                        digitalDocService.insertarDigitalDoc(digitalDoc);
+                        confirmaIdentidadVo.setSucces(true);
+                        confirmaIdentidadVo.setMessage(resp.getMessage());
+                    }else{
+                        confirmaIdentidadVo.setMessage(resp.getMessage());
+                    }
 
-                    confirmaIdentidadVo.setMessage(resp.getMessage());
 
                 }
             }
