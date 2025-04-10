@@ -237,11 +237,13 @@ public class DigitalizacionServiceGeneral {
                     digitalDoc.setOk_docto_creado(true);
                     digitalDocService.insertarDigitalDoc(digitalDoc);
 
+                    confirmaIdentidadVo.setMessage(resp.getMessage());
 
                 }
             }
         } catch (Exception e) {
             log.error("::::::::::::Error al confirmar identidad:::::::::::::" + e.getMessage());
+
         }
         return confirmaIdentidadVo;
     }
