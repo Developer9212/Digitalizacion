@@ -184,13 +184,14 @@ public class DigitalizacionServiceGeneral {
                 //crearDReqVo.setName("Anexo A");
                 tablaPK = new TablaPK(idTabla, "anexo_a");
                 tabla = tablaService.buscarPorId(tablaPK);
+                crearDReqVo.setName("Template Generico");
                 crearDReqVo.setTemplate_id(tabla.getDato2());
 
                 for (int i = 0; i < formatos.size(); i++) {
                     FormatoDigital formato = formatos.get(i);
                     String etiqueta = formato.getEtiqueta().replaceAll("[<>]", "").replaceAll("\\|$", "").replace("|", "_").replace("__", "_").replace(".sql", "");
                     if (!etiqueta.toUpperCase().contains("AMORTIZACIONES")) {
-                        sequence.add(Collections.singletonList(createItem(formato.getIdkey(), etiqueta.replace("_+$", ""), formato.getValor())));
+                        sequence.add(Collections.singletonList(createItem(formato.getIdkey(), etiqueta.replace("_+$", "").trim(), formato.getValor().trim())));
                     } else {
                         List<Amortizacion> listaAmortizaciones = amortizacionService.buscarTodasPorId(digitalDoc.getAuxiliarPK());
                         List<Map<String, Object>> amortizacionesArray = new ArrayList<>();
