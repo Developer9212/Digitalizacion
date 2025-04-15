@@ -25,6 +25,7 @@ public class DigitalController {
 
     @GetMapping("/documento-crear")
     private ResCreaDocumentoVo creaDocumento(@RequestParam(name = "opa") String opa) {
+        log.info(":::::::::::::::Creando documento para opa:"+opa+":::::::::::::::::::");
         return digitalizacionService.resCreaDocumentoVo(opa);
     }
 }

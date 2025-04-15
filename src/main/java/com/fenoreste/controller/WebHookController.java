@@ -20,6 +20,7 @@ public class WebHookController {
 
     @PostMapping(value = "confirma/identidad")
     public ConfirmaIdentidadVo confirmaIdentidad(@RequestBody ConfirmaIdentidadReqVo confirmaIdentidadVo) {
+        log.info(":::::::::::::::::Identidad confirmada:"+confirmaIdentidadVo.getIdidentidad()+"::::::::::::::::::::");
         return digitalizacionService.confirmaIdentidadVo(confirmaIdentidadVo);
     }
 }

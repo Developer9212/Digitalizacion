@@ -13,7 +13,4 @@ CREATE TABLE digital_doc_legalario(
     ok_docto_creado boolean,
     firmado boolean
 
-
-
-
 );

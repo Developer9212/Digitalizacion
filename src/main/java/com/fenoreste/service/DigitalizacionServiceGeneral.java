@@ -233,7 +233,7 @@ public class DigitalizacionServiceGeneral {
 
                     log.info(":::::::::::::::::::::Se creo el documento::::::::::::::::::");
                     //Una ves creado el documento actualizamos la tabla y enviamos a los firmantes
-                    if(!resp.isSuccess()) {
+                    if(resp.isSuccess()) {
                         digitalDoc.setIddocto_creado(resp.getData().getId());
                         digitalDoc.setOk_docto_creado(true);
                         digitalDocService.insertarDigitalDoc(digitalDoc);
