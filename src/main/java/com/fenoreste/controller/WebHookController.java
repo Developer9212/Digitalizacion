@@ -23,4 +23,12 @@ public class WebHookController {
         log.info(":::::::::::::::::Identidad confirmada:"+confirmaIdentidadVo.getIdidentidad()+"::::::::::::::::::::");
         return digitalizacionService.confirmaIdentidadVo(confirmaIdentidadVo);
     }
+
+
+    @PostMapping(value = "proceso/firma")
+    public ConfirmaIdentidadVo procesoFirma(@RequestBody String json) {
+        log.info(":::::::::::::::::Firma realizada para idDocumento"+json+"::::::::::::::::::::");
+        return digitalizacionService.confirmaFirmacontrato(json);
+    }
+
 }

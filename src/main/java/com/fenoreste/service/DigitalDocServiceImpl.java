@@ -26,4 +26,9 @@ public class DigitalDocServiceImpl implements IDigitalDocService{
     public DigitalDoc buscaPorIdIdentidad(String ididentidad) {
         return digitalDocDao.findByIdidentidad(ididentidad);
     }
+
+    @Override
+    public DigitalDoc buscaPorIdDocto(String iddoc) {
+        return digitalDocDao.BuscarPorIdDocumentoCreado(iddoc);
+    }
 }

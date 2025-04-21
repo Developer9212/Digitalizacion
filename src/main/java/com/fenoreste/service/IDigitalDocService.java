@@ -8,4 +8,6 @@ public interface IDigitalDocService {
     public DigitalDoc buscarDigitalDocPorId(AuxiliarPK auxiliarPK);
     public void insertarDigitalDoc(DigitalDoc digitalDoc);
     public DigitalDoc buscaPorIdIdentidad(String ididentidad);
+    public DigitalDoc buscaPorIdDocto(String iddoc);
+
 }

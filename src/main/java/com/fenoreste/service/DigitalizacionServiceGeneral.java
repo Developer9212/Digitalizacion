@@ -6,6 +6,7 @@ import com.fenoreste.entity.*;
 import com.fenoreste.model.*;
 import com.fenoreste.util.Util;
 import lombok.extern.slf4j.Slf4j;
+import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -145,7 +146,7 @@ public class DigitalizacionServiceGeneral {
                             digitalDocService.insertarDigitalDoc(digitalDoc);
                             log.info("::::::::::Se envio la identidad::::::::::::");
                             resp.setSuccess(true);
-                            resp.setMessage("Identidad creada con exito:"+id);
+                            resp.setMessage("Identidad creada con exito:" + id);
                         } else {
                             log.error(":::::::::::::::::::::" + identidadVoResponse.getMessage() + ":::::::::::::::::::");
                         }
@@ -195,23 +196,33 @@ public class DigitalizacionServiceGeneral {
                     } else {
                         List<Amortizacion> listaAmortizaciones = amortizacionService.buscarTodasPorId(digitalDoc.getAuxiliarPK());
                         List<Map<String, Object>> amortizacionesArray = new ArrayList<>();
+
+                        Map<String, List<Object>> columnasMap = new LinkedHashMap<>();
+
+                        // Inicializa todas las listas para las columnas
+                        columnasMap.put("NUM_P", new ArrayList<>());
+                        columnasMap.put("FECHA_CORTE_PAGO", new ArrayList<>());
+                        columnasMap.put("ABONO_PRINCIPAL", new ArrayList<>());
+                        columnasMap.put("ANUALIDAD", new ArrayList<>());
+                        columnasMap.put("SALDO_INSOLUTO", new ArrayList<>());
+                        columnasMap.put("INTERES_ORDINARIO", new ArrayList<>());
+                        columnasMap.put("IVA_INTERESES", new ArrayList<>());
+                        columnasMap.put("TOTAL_PAGAR", new ArrayList<>());
+
+                        int contador = 1;
+                        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+
                         for (Amortizacion amortizacion : listaAmortizaciones) {
-                            Map<String, Object> amortizacionMap = new HashMap<>();
-                            amortizacionMap.put("idamortizacion", amortizacion.getId()); // Reemplaza con los atributos reales
-                            amortizacionMap.put("vence", amortizacion.getVence());
-                            amortizacionMap.put("abono", amortizacion.getAbono());
-                            amortizacionMap.put("io", amortizacion.getIo());
-                            amortizacionMap.put("iva", 0.0);
-                            amortizacionMap.put("anualidad", 0.0);
-                            amortizacionMap.put("total", 0.0);
-                            amortizacionMap.put("numero_pago", 0.0);
-                            amortizacionMap.put("abono_principal", 0.0);
-                            amortizacionMap.put("saldo_insoluto", 0.0);
-                            amortizacionMap.put("ios", 0.0);
-                            amortizacionMap.put("ivas", 0.0);
-                            amortizacionMap.put("monto_total", 0.0);
-                            amortizacionesArray.add(amortizacionMap);
+                            columnasMap.get("NUM_P").add(String.valueOf(contador++));
+                            columnasMap.get("FECHA_CORTE_PAGO").add(amortizacion.getVence());
+                            columnasMap.get("ABONO_PRINCIPAL").add(String.format("%.2f", amortizacion.getAbono()));
+                            columnasMap.get("ANUALIDAD").add(String.format("%.2f", amortizacion.getAnualidad()));
+                            columnasMap.get("SALDO_INSOLUTO").add(String.format("%.2f", "0.0"));
+                            columnasMap.get("INTERES_ORDINARIO").add(String.format("%.2f", amortizacion.getIo()));
+                            columnasMap.get("IVA_INTERESES").add(String.format("%.2f", "0.00"));
+                            columnasMap.get("TOTAL_PAGAR").add(String.format("%.2f", "0.00"));
                         }
+
 
                         Map<String, Object> amortizacionData = new HashMap<>();
                         amortizacionData.put("key", formato.getIdkey());
@@ -233,13 +244,13 @@ public class DigitalizacionServiceGeneral {
 
                     log.info(":::::::::::::::::::::Se creo el documento::::::::::::::::::");
                     //Una ves creado el documento actualizamos la tabla y enviamos a los firmantes
-                    if(resp.isSuccess()) {
+                    if (resp.isSuccess()) {
                         digitalDoc.setIddocto_creado(resp.getData().getId());
                         digitalDoc.setOk_docto_creado(true);
                         digitalDocService.insertarDigitalDoc(digitalDoc);
                         confirmaIdentidadVo.setSucces(true);
                         confirmaIdentidadVo.setMessage(resp.getMessage());
-                    }else{
+                    } else {
                         confirmaIdentidadVo.setMessage(resp.getMessage());
                     }
 
@@ -269,7 +280,7 @@ public class DigitalizacionServiceGeneral {
                     List<Signer> signers = new ArrayList<>();
 
                     Auxiliar a = auxiliarService.buscarPorId(auxiliarPK);
-                    PersonaPK personaPK = new PersonaPK(a.getIdorigen(),a.getIdgrupo(),a.getIdsocio());
+                    PersonaPK personaPK = new PersonaPK(a.getIdorigen(), a.getIdgrupo(), a.getIdsocio());
                     Persona persona = personaService.buscarPorId(personaPK);
 
                     List<FormatoDigital> formatos = formatoDigitalService.buscarListaPorId(auxiliarPK);
@@ -279,52 +290,52 @@ public class DigitalizacionServiceGeneral {
                     String ogsAval2 = "";
                     String ogsCodeudor = "";
 
-                    for(int i=0;i<formatos.size();i++){
+                    for (int i = 0; i < formatos.size(); i++) {
                         FormatoDigital formato = formatos.get(i);
                         //Vamos a enviar a firmantes verificamos que personas debemos enviar
-                        if(formato.getEtiqueta().contains("ogs_codeudor") && !formato.getValor().isEmpty()){
-                            ogsCodeudor = formato.getValor().replace("-","");
-                            log.info("Ogs codeudor: "+ogsCodeudor);
+                        if (formato.getEtiqueta().contains("ogs_codeudor") && !formato.getValor().isEmpty()) {
+                            ogsCodeudor = formato.getValor().replace("-", "");
+                            log.info("Ogs codeudor: " + ogsCodeudor);
                         }
 
-                        if(formato.getEtiqueta().contains("ogs_aval1") && !formato.getValor().isEmpty()){
-                            ogsAval1 = formato.getValor().replace("-","");
-                            log.info("Ogs aval1: "+ogsAval1);
+                        if (formato.getEtiqueta().contains("ogs_aval1") && !formato.getValor().isEmpty()) {
+                            ogsAval1 = formato.getValor().replace("-", "");
+                            log.info("Ogs aval1: " + ogsAval1);
                         }
 
-                        if(formato.getEtiqueta().contains("ogs_aval2") && !formato.getValor().isEmpty()){
-                            ogsAval2 = formato.getValor().replace("-","");
-                            log.info("Ogs aval2: "+ogsAval2);
+                        if (formato.getEtiqueta().contains("ogs_aval2") && !formato.getValor().isEmpty()) {
+                            ogsAval2 = formato.getValor().replace("-", "");
+                            log.info("Ogs aval2: " + ogsAval2);
                         }
                     }
 
                     Signer signer = new Signer();
 
                     OgsVo ogsVo = new OgsVo();
-                    if(!ogsCodeudor.isEmpty()){
+                    if (!ogsCodeudor.isEmpty()) {
                         ogsVo = util.ogs(ogsCodeudor);
-                        personaPK = new PersonaPK(ogsVo.getIdorigen(),ogsVo.getIdgrupo(),ogsVo.getIdsocio());
+                        personaPK = new PersonaPK(ogsVo.getIdorigen(), ogsVo.getIdgrupo(), ogsVo.getIdsocio());
                         persona = personaService.buscarPorId(personaPK);
                         signer.setEmail(persona.getEmail());
-                        signer.setFullname(persona.getNombre() +" " + persona.getAppaterno() +" " +persona.getApmaterno());
+                        signer.setFullname(persona.getNombre() + " " + persona.getAppaterno() + " " + persona.getApmaterno());
                         signer.setRole("FIRMANTE");
                         signer.setType("FIRMA");
                         signers.add(signer);
-                    } else if(!ogsAval1.isEmpty()){
+                    } else if (!ogsAval1.isEmpty()) {
                         ogsVo = util.ogs(ogsAval1);
-                        personaPK = new PersonaPK(ogsVo.getIdorigen(),ogsVo.getIdgrupo(),ogsVo.getIdsocio());
+                        personaPK = new PersonaPK(ogsVo.getIdorigen(), ogsVo.getIdgrupo(), ogsVo.getIdsocio());
                         persona = personaService.buscarPorId(personaPK);
                         signer.setEmail(persona.getEmail());
-                        signer.setFullname(persona.getNombre() +" " + persona.getAppaterno() +" " +persona.getApmaterno());
+                        signer.setFullname(persona.getNombre() + " " + persona.getAppaterno() + " " + persona.getApmaterno());
                         signer.setRole("FIRMANTE");
                         signer.setType("FIRMA");
                         signers.add(signer);
                     } else if (!ogsAval2.isEmpty()) {
                         ogsVo = util.ogs(ogsAval2);
-                        personaPK = new PersonaPK(ogsVo.getIdorigen(),ogsVo.getIdgrupo(),ogsVo.getIdsocio());
+                        personaPK = new PersonaPK(ogsVo.getIdorigen(), ogsVo.getIdgrupo(), ogsVo.getIdsocio());
                         persona = personaService.buscarPorId(personaPK);
                         signer.setEmail(persona.getEmail());
-                        signer.setFullname(persona.getNombre() +" " + persona.getAppaterno() +" " +persona.getApmaterno());
+                        signer.setFullname(persona.getNombre() + " " + persona.getAppaterno() + " " + persona.getApmaterno());
                         signer.setRole("FIRMANTE");
                         signer.setType("FIRMA");
                         signers.add(signer);
@@ -341,11 +352,39 @@ public class DigitalizacionServiceGeneral {
             }
 
         } catch (Exception e) {
-            log.error(":::::::::::::Sucedio un error al enviar a firmar:::::::::"+e.getMessage());
+            log.error(":::::::::::::Sucedio un error al enviar a firmar:::::::::" + e.getMessage());
         }
         return resSignersVo;
     }
 
+    public ConfirmaIdentidadVo confirmaFirmacontrato(String cadena) {
+        ConfirmaIdentidadVo confirmaIdentidadVo = new ConfirmaIdentidadVo();
+
+        try {
+            JSONObject json = new JSONObject(cadena);
+            JSONObject jsonObject = json.getJSONObject("document");
+            String idDoctoFirmado = jsonObject.getString("id");
+
+            if (!idDoctoFirmado.isEmpty()) {
+                DigitalDoc digitalDoc = digitalDocService.buscaPorIdDocto(idDoctoFirmado);
+                if (digitalDoc != null) {
+                    confirmaIdentidadVo.setSucces(true);
+                    confirmaIdentidadVo.setMessage("Recibido");
+                    digitalDoc.setStatus("Firmado correctamente");
+                    digitalDoc.setFirmado(true);
+                    digitalDocService.insertarDigitalDoc(digitalDoc);
+                    log.info("::::::::::Recibido correctamente:::::::::");
+                } else {
+                    confirmaIdentidadVo.setSucces(false);
+                    confirmaIdentidadVo.setMessage("No se encuentra el iddocumento firmado");
+                    log.info("::::::::::::::::::No se encuentra el documento firmado::::::::::::::");
+                }
+            }
+        } catch (Exception e) {
+            log.info(":::::::::::::Error al recibidor notificacion documento firmado:::::::::::");
+        }
+        return confirmaIdentidadVo;
+    }
 
     private static Map<String, Object> createItem(int key, String name, String value) {
         Map<String, Object> item = new HashMap<>();
