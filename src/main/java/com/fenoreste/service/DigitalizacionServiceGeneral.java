@@ -392,10 +392,10 @@ public class DigitalizacionServiceGeneral {
                     }
 
                     dataRes.setSigners(signers);
-                    resSignersVo.setDataResSignersVos(dataRes);
+                    resSignersVo.setData(dataRes);
 
                     log.info("::::::::::Req:"+resSignersVo);
-                    if(!resSignersVo.getDataResSignersVos().getSigners().isEmpty()){
+                    if(!resSignersVo.getData().getSigners().isEmpty()){
                         signersReqVo.setSigners(signers);
                         log.info("::::::::::::Vamos a enviar a firmantes:::::::::::::::");
                         System.out.println(":::::::Tu peticion:::"+signersReqVo);
