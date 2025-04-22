@@ -253,7 +253,7 @@ public class DigitalizacionServiceGeneral {
                         confirmaIdentidadVo.setSucces(true);
                         confirmaIdentidadVo.setMessage(resp.getMessage());
                         digitalDoc.setOk_identidad(true);
-                        digitalDoc.setMensajeFinal("Documento creado exitosamente");
+                        digitalDoc.setMensajeFinal("Documento creado exitosamente"+":"+new Date());
 
                         log.info("::::::::::::::Documento enviado,enviaremos a firmantes::::::::::::::::::::");
 
@@ -262,7 +262,7 @@ public class DigitalizacionServiceGeneral {
                         if (resSignersVo.isSuccess()) {
                             confirmaIdentidadVo.setSucces(true);
                             confirmaIdentidadVo.setMessage(resSignersVo.getMessage());
-                            digitalDoc.setMensajeFinal(resSignersVo.getMessage());
+                            digitalDoc.setMensajeFinal(resSignersVo.getMessage()+":"+new Date());
                             log.info(":::::::::::::::::Mensaje envio a firmantes:"+resSignersVo.getMessage()+"::::::::::::::::::::::");
                             digitalDoc.setEnviado_firmantes(true);
                         }else{
@@ -271,7 +271,7 @@ public class DigitalizacionServiceGeneral {
                         }
                     } else {
                         confirmaIdentidadVo.setMessage(resp.getMessage());
-                        digitalDoc.setMensajeFinal(resp.getMessage());
+                        digitalDoc.setMensajeFinal(resp.getMessage()+":"+new Date());
                     }
                 }
             }
@@ -279,7 +279,7 @@ public class DigitalizacionServiceGeneral {
             log.error("::::::::::::Error al confirmar identidad:::::::::::::" + e.getMessage());
             digitalDoc.setOk_identidad(false);
             digitalDoc.setOk_docto_creado(false);
-            digitalDoc.setMensajeFinal("Error al confirmar identidad:::::::::::::" + e.getMessage());
+            digitalDoc.setMensajeFinal("Error al confirmar identidad:::::::::::::" + e.getMessage()+":"+new Date());
 
         }
         digitalDocService.insertarDigitalDoc(digitalDoc);
@@ -338,8 +338,16 @@ public class DigitalizacionServiceGeneral {
                     }
 
                     Signer signer = new Signer();
-
                     OgsVo ogsVo = new OgsVo();
+
+                    if(!persona.getEmail().isEmpty()){
+                        signer.setEmail(persona.getEmail());
+                        signer.setFullname(persona.getNombre() + " " + persona.getAppaterno() + " " + persona.getApmaterno());
+                        signer.setRole("FIRMANTE");
+                        signer.setType("FIRMA");
+                        signers.add(signer);
+                    }
+
                     if (!ogsCodeudor.isEmpty()) {
                         ogsVo = util.ogs(ogsCodeudor);
                         personaPK = new PersonaPK(ogsVo.getIdorigen(), ogsVo.getIdgrupo(), ogsVo.getIdsocio());

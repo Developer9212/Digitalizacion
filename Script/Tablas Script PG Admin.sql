@@ -14,5 +14,7 @@ CREATE TABLE digital_doc_legalario(
     ok_identidad boolean,
     iddocto_creado text,
     ok_docto_creado boolean,
-    firmado boolean
+	enviado_firmantes boolean,
+    firmado boolean,
+	mensajeFinal text
 );
