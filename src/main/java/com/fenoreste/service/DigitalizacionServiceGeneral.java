@@ -153,6 +153,8 @@ public class DigitalizacionServiceGeneral {
                             log.error(":::::::::::::::::::::" + identidadVoResponse.getMessage() + ":::::::::::::::::::");
                             digitalDoc.setMensajeFinal(identidadVoResponse.getMessage()+":"+new Date());
                             digitalDocService.insertarDigitalDoc(digitalDoc);
+                            resp.setSuccess(false);
+                            resp.setMessage(identidadVoResponse.getMessage());
                         }
                     }
                 } else {
