@@ -194,7 +194,7 @@ public class DigitalizacionServiceGeneral {
                         sequence.add(Collections.singletonList(createItem(formato.getIdkey(), etiqueta.replace("_+$", "").trim(), formato.getValor().trim())));
                     } else {
                         List<Amortizacion> listaAmortizaciones = amortizacionService.buscarTodasPorId(digitalDoc.getAuxiliarPK());
-                        List<Map<String, Object>> amortizacionesArray = new ArrayList<>();
+
 
                         Map<String, List<Object>> columnasMap = new LinkedHashMap<>();
 
@@ -226,7 +226,7 @@ public class DigitalizacionServiceGeneral {
                         Map<String, Object> amortizacionData = new HashMap<>();
                         amortizacionData.put("key", formato.getIdkey());
                         amortizacionData.put("name", "amortizaciones");
-                        amortizacionData.put("value", amortizacionesArray);
+                        amortizacionData.put("value", columnasMap);
                         sequence.add(Collections.singletonList(amortizacionData));
                     }
                     banderaDatos = true;
