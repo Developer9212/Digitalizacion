@@ -299,7 +299,7 @@ public class DigitalizacionServiceGeneral {
                     signersReqVo.setDocument_id(digitalDoc.getIddocto_creado());
                     signersReqVo.setWorkflow(true);
                     signersReqVo.setUse_whatsapp(false);
-                    List<Signer> signers = new ArrayList<>();
+                    List<Signer> signers = new ArrayList<Signer>();
 
                     Auxiliar a = auxiliarService.buscarPorId(opa);
                     PersonaPK personaPK = new PersonaPK(a.getIdorigen(), a.getIdgrupo(), a.getIdsocio());
@@ -386,6 +386,7 @@ public class DigitalizacionServiceGeneral {
                         signers.add(signer);
                     }
 
+                    log.info("::::::::::Req:"+resSignersVo);
                     if(!signersReqVo.getSigners().isEmpty()){
                         log.info("::::::::::::Vamos a enviar a firmantes:::::::::::::::");
                         ResSignersVo signerResVo = apisHttp.firmantes(signersReqVo);
