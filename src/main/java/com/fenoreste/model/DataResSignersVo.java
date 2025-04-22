@@ -13,6 +13,7 @@ import java.util.List;
 public class DataResSignersVo implements Serializable {
 
     private List<Signer> signers;
+    private UserDocumentResVo user_document;
 
 
     private static final long serialVersionUID = 1L;

@@ -19,9 +19,9 @@ public class UserDocumentResVo implements Serializable {
     private String name;
     private String external_id;
     private List<SequenceResVo> sequence;
-    private Boolean completed;
+    private boolean completed;
     private Integer signature_progress;
-    private Boolean workflow;
+    private boolean workflow;
     private String updated_at;
     private String created_at;
     private String config_temp;
