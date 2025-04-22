@@ -19,7 +19,7 @@ public class UserDocumentResVo implements Serializable {
     private String user_id;
     private String name;
     private String external_id;
-    private List<SequenceResVo> sequence;
+   // private List<SequenceResVo> sequence;
     private boolean completed;
     private boolean workflow;
     private String updated_at;
