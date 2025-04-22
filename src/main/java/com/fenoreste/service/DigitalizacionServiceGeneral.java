@@ -299,6 +299,7 @@ public class DigitalizacionServiceGeneral {
                     signersReqVo.setDocument_id(digitalDoc.getIddocto_creado());
                     signersReqVo.setWorkflow(true);
                     signersReqVo.setUse_whatsapp(false);
+                    DataResSignersVo dataRes = new DataResSignersVo();
                     List<Signer> signers = new ArrayList<Signer>();
 
                     Auxiliar a = auxiliarService.buscarPorId(opa);
@@ -307,12 +308,13 @@ public class DigitalizacionServiceGeneral {
 
                     List<FormatoDigital> formatos = formatoDigitalService.buscarListaPorId(opa);//auxiliarPK);
 
-                    String correoSocio = persona.getEmail();
+
                     String ogsAval1 = "";
                     String ogsAval2 = "";
                     String ogsAval3 = "";
                     String ogsCodeudor = "";
 
+                    System.out.println("gfdgfdgfdg");
                     for (int i = 0; i < formatos.size(); i++) {
                         FormatoDigital formato = formatos.get(i);
                         //Vamos a enviar a firmantes verificamos que personas debemos enviar
@@ -348,6 +350,7 @@ public class DigitalizacionServiceGeneral {
                         signers.add(signer);
                     }
 
+                    System.out.println("padso asasdasodso");
                     if (!ogsCodeudor.isEmpty()) {
                         ogsVo = util.ogs(ogsCodeudor);
                         personaPK = new PersonaPK(ogsVo.getIdorigen(), ogsVo.getIdgrupo(), ogsVo.getIdsocio());
@@ -386,9 +389,14 @@ public class DigitalizacionServiceGeneral {
                         signers.add(signer);
                     }
 
+                    dataRes.setSigners(signers);
+                    resSignersVo.setDataResSignersVos(dataRes);
+
                     log.info("::::::::::Req:"+resSignersVo);
-                    if(!signersReqVo.getSigners().isEmpty()){
+                    if(!resSignersVo.getDataResSignersVos().getSigners().isEmpty()){
+                        signersReqVo.setSigners(signers);
                         log.info("::::::::::::Vamos a enviar a firmantes:::::::::::::::");
+                        System.out.println(":::::::Tu peticion:::"+signersReqVo);
                         ResSignersVo signerResVo = apisHttp.firmantes(signersReqVo);
                         resSignersVo.setMessage(signerResVo.getMessage());
                     }

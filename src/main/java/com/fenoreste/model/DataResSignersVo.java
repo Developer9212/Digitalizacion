@@ -12,7 +12,7 @@ import java.util.List;
 @NoArgsConstructor
 public class DataResSignersVo implements Serializable {
 
-    private List<SignerResVo> signers;
+    private List<Signer> signers;
 
 
     private static final long serialVersionUID = 1L;

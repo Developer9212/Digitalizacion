@@ -228,7 +228,10 @@ public class ApisHttp {
                     .connectTimeout(220, java.util.concurrent.TimeUnit.SECONDS) // Tiempo de espera para establecer la conexión
                     .readTimeout(220, java.util.concurrent.TimeUnit.SECONDS)    // Tiempo de espera para la lectura de datos
                     .build();
-            String json = mapper.writeValueAsString(resSignersVo);
+            String json = mapper.writeValueAsString(signersVoReq);
+
+            tablaPK = new TablaPK("digitalizacion", "token");
+            tabla = tablaService.buscarPorId(tablaPK);
 
             log.info("Json signers a enviar es:"+json);
             mediaType = MediaType.parse("application/application/json");
@@ -254,7 +257,7 @@ public class ApisHttp {
                 resSignersVo.setMessage(res.get("message").getAsString());
             }
         }catch (Exception e) {
-             log.error(":::::::::::::::::::::::::::Error al enviar a firmantes::::::::::::::::::::::::");
+            log.error(":::::::::::::::::::::::::::Error al enviar a firmantes::::::::::::::::::::::::"+e.getMessage());
         }
 
         return resSignersVo;
