@@ -399,19 +399,28 @@ public class DigitalizacionServiceGeneral {
                         System.out.println(":::::::Tu peticion:::"+signersReqVo);
                         ResSignersVo signerResVo = apisHttp.firmantes(signersReqVo);
                         resSignersVo.setMessage(signerResVo.getMessage());
+                        resSignersVo.setSuccess(true);
+                        resSignersVo.setMessage(signerResVo.getMessage());
+                        digitalDoc.setMensajeFinal("Documento enviado a firma");
+                        digitalDoc.setEnviado_firmantes(true);
                     }
                 } else {
                     log.info(":::::::::::::El documento ya esta firmado::::::::::::::");
                     resSignersVo.setMessage("El documento ya esta firmado");
+                    resSignersVo.setSuccess(false);
+                    resSignersVo.setMessage("El documento ya esta firmado");
+                    digitalDoc.setMensajeFinal("Documento ya firmado");
                 }
             } else {
                 log.info("::::::::::::Es el documento no existe::::::::::::::");
                 resSignersVo.setMessage("El documento no existe");
+                digitalDoc.setMensajeFinal("Documento no existe");
             }
-
+           digitalDocService.insertarDigitalDoc(digitalDoc);
         } catch (Exception e) {
             log.error(":::::::::::::Sucedio un error al enviar a firmar:::::::::" + e.getMessage());
             resSignersVo.setMessage("Error al enviar a firmantes:"+e.getMessage());
+
         }
         return resSignersVo;
     }
