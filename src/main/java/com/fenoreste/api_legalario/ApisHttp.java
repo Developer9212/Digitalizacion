@@ -146,8 +146,8 @@ public class ApisHttp {
             tabla = tablaService.buscarPorId(tablaPK);
             sslUtil.disableSSLCertificateChecking();
             client = new OkHttpClient.Builder()
-                    .connectTimeout(20, java.util.concurrent.TimeUnit.SECONDS) // Tiempo de espera para establecer la conexión
-                    .readTimeout(20, java.util.concurrent.TimeUnit.SECONDS)    // Tiempo de espera para la lectura de datos
+                    .connectTimeout(220, java.util.concurrent.TimeUnit.SECONDS) // Tiempo de espera para establecer la conexión
+                    .readTimeout(220, java.util.concurrent.TimeUnit.SECONDS)    // Tiempo de espera para la lectura de datos
                     .build();
             String json = mapper.writeValueAsString(signersVoReq);
             mediaType = MediaType.parse("application/application/json");
@@ -183,8 +183,8 @@ public class ApisHttp {
             tabla = tablaService.buscarPorId(tablaPK);
             sslUtil.disableSSLCertificateChecking();
             client = new OkHttpClient.Builder()
-                    .connectTimeout(20, java.util.concurrent.TimeUnit.SECONDS) // Tiempo de espera para establecer la conexión
-                    .readTimeout(20, java.util.concurrent.TimeUnit.SECONDS)    // Tiempo de espera para la lectura de datos
+                    .connectTimeout(220, java.util.concurrent.TimeUnit.SECONDS) // Tiempo de espera para establecer la conexión
+                    .readTimeout(220, java.util.concurrent.TimeUnit.SECONDS)    // Tiempo de espera para la lectura de datos
                     .build();
             String json = mapper.writeValueAsString(crearDocumento);
 
@@ -225,8 +225,8 @@ public class ApisHttp {
         try {
             sslUtil.disableSSLCertificateChecking();
             client = new OkHttpClient.Builder()
-                    .connectTimeout(20, java.util.concurrent.TimeUnit.SECONDS) // Tiempo de espera para establecer la conexión
-                    .readTimeout(20, java.util.concurrent.TimeUnit.SECONDS)    // Tiempo de espera para la lectura de datos
+                    .connectTimeout(220, java.util.concurrent.TimeUnit.SECONDS) // Tiempo de espera para establecer la conexión
+                    .readTimeout(220, java.util.concurrent.TimeUnit.SECONDS)    // Tiempo de espera para la lectura de datos
                     .build();
             String json = mapper.writeValueAsString(resSignersVo);
 

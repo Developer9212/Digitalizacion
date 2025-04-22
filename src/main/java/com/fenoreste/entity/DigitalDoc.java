@@ -25,7 +25,9 @@ public class DigitalDoc implements Serializable {
     private boolean ok_identidad=false;
     private String iddocto_creado;
     private boolean ok_docto_creado;
+    private boolean enviado_firmantes = false;
     private boolean firmado;
+    private String mensajeFinal;
 
     private static final long serialVersionUID = 1L;
 }
