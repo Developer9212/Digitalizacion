@@ -393,6 +393,9 @@ public class DigitalizacionServiceGeneral {
 
 
                     log.info("::::::::::Req:"+resSignersVo);
+
+                    signersReqVo.setSigners(signers);
+                    
                     if(!signersReqVo.getSigners().isEmpty()){
                         signersReqVo.setSigners(signers);
                         log.info("::::::::::::Vamos a enviar a firmantes:::::::::::::::");
