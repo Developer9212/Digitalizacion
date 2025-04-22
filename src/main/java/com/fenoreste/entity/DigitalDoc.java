@@ -22,7 +22,7 @@ public class DigitalDoc implements Serializable {
     private Date fecha_captura;
     private String status;
     private String ididentidad;
-    private boolean ok_identidad;
+    private boolean ok_identidad=false;
     private String iddocto_creado;
     private boolean ok_docto_creado;
     private boolean firmado;

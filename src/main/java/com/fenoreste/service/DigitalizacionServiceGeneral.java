@@ -175,7 +175,6 @@ public class DigitalizacionServiceGeneral {
 
             if (digitalDoc != null) {
                 log.info("Se encuentra la identidad");
-                digitalDoc.setOk_identidad(true);
                 digitalDocService.insertarDigitalDoc(digitalDoc);
                 //Una ves guardada la identidad vamos a enviar las variables para el documento
                 List<FormatoDigital> formatos = formatoDigitalService.buscarListaPorId(digitalDoc.getAuxiliarPK());
@@ -215,12 +214,12 @@ public class DigitalizacionServiceGeneral {
                         for (Amortizacion amortizacion : listaAmortizaciones) {
                             columnasMap.get("NUM_P").add(String.valueOf(contador++));
                             columnasMap.get("FECHA_CORTE_PAGO").add(amortizacion.getVence());
-                            columnasMap.get("ABONO_PRINCIPAL").add(String.format("%.2f", amortizacion.getAbono()));
-                            columnasMap.get("ANUALIDAD").add(String.format("%.2f", amortizacion.getAnualidad()));
-                            columnasMap.get("SALDO_INSOLUTO").add(String.format("%.2f", "0.0"));
-                            columnasMap.get("INTERES_ORDINARIO").add(String.format("%.2f", amortizacion.getIo()));
-                            columnasMap.get("IVA_INTERESES").add(String.format("%.2f", "0.00"));
-                            columnasMap.get("TOTAL_PAGAR").add(String.format("%.2f", "0.00"));
+                            columnasMap.get("ABONO_PRINCIPAL").add( amortizacion.getAbono());
+                            columnasMap.get("ANUALIDAD").add(amortizacion.getAnualidad());
+                            columnasMap.get("SALDO_INSOLUTO").add(0.00);
+                            columnasMap.get("INTERES_ORDINARIO").add(amortizacion.getIo());
+                            columnasMap.get("IVA_INTERESES").add(0.00);
+                            columnasMap.get("TOTAL_PAGAR").add(0.00);
                         }
 
 
@@ -250,6 +249,7 @@ public class DigitalizacionServiceGeneral {
                         digitalDocService.insertarDigitalDoc(digitalDoc);
                         confirmaIdentidadVo.setSucces(true);
                         confirmaIdentidadVo.setMessage(resp.getMessage());
+                        digitalDoc.setOk_identidad(true);
                     } else {
                         confirmaIdentidadVo.setMessage(resp.getMessage());
                     }
