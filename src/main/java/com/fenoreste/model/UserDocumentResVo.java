@@ -1,5 +1,6 @@
 package com.fenoreste.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -10,6 +11,7 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 @Data
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class UserDocumentResVo implements Serializable {
 
     private String id;
@@ -25,7 +27,6 @@ public class UserDocumentResVo implements Serializable {
     private String updated_at;
     private String created_at;
     private String config_temp;
-    private String file_path;
 
     private static final long serialVersionUID = 1L;
 }
