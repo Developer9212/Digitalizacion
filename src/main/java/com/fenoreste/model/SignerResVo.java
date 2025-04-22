@@ -12,7 +12,7 @@ import java.io.Serializable;
 @NoArgsConstructor
 public class SignerResVo implements Serializable {
 
-    private Integer id;
+    private String id;
     private String fullname;
     private String email;
     private String phone;
