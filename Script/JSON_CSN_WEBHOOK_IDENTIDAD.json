@@ -1,0 +1,18 @@
+{
+    "onboarding_id": "67fee5cdac3fe049b42d0302", //obligatorio ID de la identidad
+    "status": "completed", //Obligatorio estatus de la identidad
+    "type": "identity.completed", //obligatorio tipo de webhook
+    "user_email": "apollo.avanzado@legalario.com", //opcional correo del usuario que creo la identidad
+    "fullname": "Armando Reyes", //opcional nombre completo del participante de la identidad
+    "phone": "5583301080",//opcional telefono del participante de la identidad
+    "created_at": { //opcional fecha de creacion
+      "date": "2025-04-15 18:03:41.000000",
+      "timezone_type": 3,
+      "timezone": "America/Mexico_City"
+    },
+    "updated_at": { //opcional fecha de la ultima modificacion
+      "date": "2025-04-15 18:36:32.000000",
+      "timezone_type": 3,
+      "timezone": "America/Mexico_City"
+    }
+  }

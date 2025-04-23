@@ -1,0 +1,46 @@
+{
+  "type": "document.sign", //tipo de webhook obligatorio
+  "document": {  //obligatorio JSON del documento firmado
+    "id": "67acdabd478e530443138953", //obligatorio id del documento firmado
+    "name": "contrato zorro lt 04 chrystian enriquez", //obligatorio nombre del documento firmado
+    "sequence": [], //opcional
+    "created_at": {
+      "date": "2025-02-12 17:30:37.000000",
+      "timezone_type": 3,
+      "timezone": "UTC"
+    },//opcional fecha de creacion
+    "updated_at": {
+      "date": "2025-02-17 19:21:28.000000",
+      "timezone_type": 3,
+      "timezone": "UTC"
+    },//opcional fecha de la ultima modificacion
+    "completed": true, //opcional bandera de creacion del ocumento 
+    "progress": 100, //opcional bandera de creacion del ocumento 
+    "ready_to_sign": true, //opcional bandera que el documento fue convocado a firma
+    "signature_progress": 100 //obligatorio valor que define si ya se concluyeron las firmas
+  },
+  "signers": [ //opcional Array object de firmantes
+    {
+      "id": "67acdc9cf9dce10c636a25b3", //id del firmante
+      "user_documents_organization_id": "67acdabd478e530443138953",  //id del documento padre
+      "fullname": "CHRYSTIAN HIRAM ENRIQUEZ GARCIA", //nombre completo del firmante
+      "email": "chryshiram@gmail.com", //correo del firmante
+      "phone": "No proporcionado", //telefono del firmante
+      "status": "confirmed", //estatus de firma
+      "updated_at": { //ultima modificacion
+        "date": "2025-02-12 18:07:36.000000",
+        "timezone_type": 3,
+        "timezone": "UTC"
+      },
+      "created_at": { //fecha de creacion
+        "date": "2025-02-12 17:38:36.000000",
+        "timezone_type": 3,
+        "timezone": "UTC"
+      }
+    }
+    //... N# firmantes
+  ], 
+  "attachments": [], //opcional array de documentos adjuntos
+  "zip": "base64", //opcional tipo de archivo que se manda
+  "file_hash": "ca7349a7279352108e413bfe181d7ecb7eda7878528d72d8977497bd4bc0b629" //opcional .ZIP con todo el caudal probatorio (expediente digital)
+}

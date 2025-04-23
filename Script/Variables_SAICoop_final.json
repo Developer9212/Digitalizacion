@@ -1,0 +1,1070 @@
+{
+    "name": "Template Generico",
+    "type": "template",
+    "template_id": "67eadea8c046bd05d01058b2",
+    "sequence": [
+        [
+            {
+                "name": "abonos",
+                "value": "60",
+                "key": 1
+            }
+        ],
+        [
+            {
+                "name": "abonos_letra",
+                "value": "SESENTA",
+                "key": 2
+            }
+        ],
+        [
+            {
+                "name": "amort_fecha_ultimo_aa",
+                "value": "30",
+                "key": 3
+            }
+        ],
+        [
+            {
+                "name": "amort_fecha_ultimo_aaaa",
+                "value": "2030",
+                "key": 4
+            }
+        ],
+        [
+            {
+                "name": "amort_fecha_ultimo_dd/ml/aaaa",   //"amort_fecha_ultimo_dd_ml_aaaa"
+                "value": "10/Abril/2030",
+                "key": 5
+            }
+        ],
+        [
+            {
+                "name": "amort_fecha_ultimo_dd",
+                "value": "10",
+                "key": 6
+            }
+        ],
+        [
+            {
+                "name": "amort_fecha_ultimo_ml",
+                "value": "Abril",
+                "key": 7
+            }
+        ],
+        [
+            {
+                "name": "amortizaciones",
+                "key": 8,
+                "value": {
+                          "NUM_P": [
+                            "1",
+                            "2",
+                            "3"
+                          ],
+                          "FECHA_CORTE_PAGO": [
+                            "10/01/2024",
+                            "10/02/2024",
+                            "10/03/2024"
+                          ],
+                          "ABONO_PRINCIPAL": [
+                            "555.10",
+                            "393.19",
+                            "590.63"
+                          ],
+                          "ANUALIDAD": [
+                            "0.10",
+                            "0.19",
+                            "0.63"
+                          ],
+                          "SALDO_INSOLUTO": [
+                            "99444.90",
+                            "99054.19",
+                            "98461.08"
+                          ],
+                          "INTERES_ORDINARIO": [
+                            "1699.80",
+                            "2495.19",
+                            "2325.63"
+                          ],
+                          "IVA_INTERESES": [
+                            "271.97",
+                            "399.25",
+                            "372.02"
+                          ],
+                          "TOTAL_PAGAR": [
+                            "2526.88",
+                            "3287.75",
+                            "3287.75"
+                          ]
+                }
+            }
+        ],
+        [
+            {
+                "name": "cat",
+                "value": "21.7",
+                "key": 9
+            }
+        ],
+        [
+            {
+                "name": "cat_letra",
+                "value": "VEINTI UN PUNTO SIETE POR CIENTO",
+                "key": 10
+            }
+        ],
+        [
+            {
+                "name": "color_g1",
+                "value": "AZUL",
+                "key": 11
+            }
+        ],
+        [
+            {
+                "name": "color_g2",
+                "value": "ROJO",
+                "key": 12
+            }
+        ],
+        [
+            {
+                "name": "color_g3",
+                "value": "VERDE",
+                "key": 13
+            }
+        ],
+        [
+            {
+                "name": "conversion_meses",
+                "value": "60",
+                "key": 14
+            }
+        ],
+        [
+            {
+                "name": "cuenta_de_tdd",
+                "value": "13133002996",
+                "key": 15
+            }
+        ],
+        [
+            {
+                "name": "curp_rfc",
+                "value": "LULD941215828",
+                "key": 16
+            }
+        ],
+        [
+            {
+                "name": "dia_de_hoy_aaaa",
+                "value": "2025",
+                "key": 17
+            }
+        ],
+        [
+            {
+                "name": "dia_de_hoy_dd",
+                "value": "14",
+                "key": 18
+            }
+        ],
+        [
+            {
+                "name": "dia_de_hoy_ml",
+                "value": "Abril",
+                "key": 19
+            }
+        ],
+        [
+            {
+                "name": "dia_de_pago",
+                "value": "10",
+                "key": 20
+            }
+        ],
+        [
+            {
+                "name": "dia_de_pago1",
+                "value": "10",
+                "key": 21
+            }
+        ],
+        [
+            {
+                "name": "dia_exp_aaaa",
+                "value": "2025",
+                "key": 22
+            }
+        ],
+        [
+            {
+                "name": "dia_exp_dd",
+                "value": "14",
+                "key": 23
+            }
+        ],
+        [
+            {
+                "name": "dia_exp_ml",
+                "value": "Abril",
+                "key": 24
+            }
+        ],
+        [
+            {
+                "name": "direccion_aval1",
+                "value": "RESIDENCIAL LAS PUENTES",
+                "key": 25
+            }
+        ],
+        [
+            {
+                "name": "direccion_aval1_colonia",
+                "value": "HACIENDA LAS PUENTES",
+                "key": 26
+            }
+        ],
+        [
+            {
+                "name": "direccion_aval1_direccion",
+                "value": "CALLE 21 RESIDENCIA LAS PUENTES",
+                "key": 27
+            }
+        ],
+        [
+            {
+                "name": "direccion_aval1_municipio",
+                "value": "SAN NICOLAS DE LOS GARZA",
+                "key": 28
+            }
+        ],
+        [
+            {
+                "name": "direccion_aval2",
+                "value": "CALLE NARANJOS",
+                "key": 29
+            }
+        ],
+        [
+            {
+                "name": "direccion_aval2_colonia",
+                "value": "HACIENDA LAS PUENTES",
+                "key": 30
+            }
+        ],
+        [
+            {
+                "name": "direccion_aval2_direccion",
+                "value": "CALLE NARANJOS HACIENDA LAS PUENTES",
+                "key": 31
+            }
+        ],
+        [
+            {
+                "name": "direccion_aval2_municipio",
+                "value": "SAN NICOLAS DE LOS GARZA",
+                "key": 32
+            }
+        ],
+        [
+            {
+                "name": "direccion_gp",
+                "value": "RESIDENCIAL PALMAS",
+                "key": 33
+            }
+        ],
+        [
+            {
+                "name": "direccion_gp_direccion",
+                "value": "CALLE OLMECA RESIDENCIAL PALMAS",
+                "key": 34
+            }
+        ],
+        [
+            {
+                "name": "direccion_origenp",
+                "value": "AV. REPUBLICA MEXICANA 401-401, LAS PUENTES, SAN NICOLAS DE LOS GARZA, NUEVO LEON, CP 66465",
+                "key": 35
+            }
+        ],
+        [
+            {
+                "name": "direccion",
+                "value": "C 21 604",
+                "key": 36
+            }
+        ],
+        [
+            {
+                "name": "direccion_codigopostal",
+                "value": "66460",
+                "key": 37
+            }
+        ],
+        [
+            {
+                "name": "direccion_completa",
+                "value": "C 21 604 , Las Puentes Sect 1, San Nicolas de los Garza, Nuevo Leon, 66460",
+                "key": 38
+            }
+        ],
+        [
+            {
+                "name": "direccion_direccion",
+                "value": "C 21 604 , Las Puentes Sect 1, San Nicolas de los Garza, Nuevo Leon, 66460",
+                "key": 39
+            }
+        ],
+        [
+            {
+                "name": "direccion_munest",
+                "value": "San Nicolas de los Garza, Nuevo Leon",
+                "key": 40
+            }
+        ],
+        [
+            {
+                "name": "direccion_municipio",
+                "value": "San Nicolas de los Garza",
+                "key": 41
+            }
+        ],
+        [
+            {
+                "name": "direccion_numero_casa_letra",
+                "value": "SEISCIENTOS CUATRO",
+                "key": 42
+            }
+        ],
+        [
+            {
+                "name": "email",
+                "value": "5dioneilucio@gmail.com",
+                "key": 43
+            }
+        ],
+        [
+            {
+                "name": "fecha_activacion",
+                "value": "14/04/2025",
+                "key": 44
+            }
+        ],
+        [
+            {
+                "name": "fecha_hoy_dia",
+                "value": "14",
+                "key": 45
+            }
+        ],
+        [
+            {
+                "name": "fecha_hoy_dia_minusculas",
+                "value": "lunes",
+                "key": 46
+            }
+        ],
+        [
+            {
+                "name": "fecha_hoy_mes",
+                "value": "4",
+                "key": 47
+            }
+        ],
+        [
+            {
+                "name": "fecha_hoy_mes_minusculas",
+                "value": "Abril",
+                "key": 48
+            }
+        ],
+        [
+            {
+                "name": "fecha_hoy",
+                "value": "14/4/2025",
+                "key": 49
+            }
+        ],
+        [
+            {
+                "name": "fecha_primer_pago",
+                "value": "10/5/2025",
+                "key": 50
+            }
+        ],
+        [
+            {
+                "name": "fecha_primer_pago_aa",
+                "value": "25",
+                "key": 51
+            }
+        ],
+        [
+            {
+                "name": "fecha_primer_pago_aaaa",
+                "value": "2025",
+                "key": 52
+            }
+        ],
+        [
+            {
+                "name": "fecha_primer_pago_dd",
+                "value": "10",
+                "key": 53
+            }
+        ],
+        [
+            {
+                "name": "fecha_primer_pago_ml",
+                "value": "Mayo",
+                "key": 54
+            }
+        ],
+        [
+            {
+                "name": "fechaapertura",
+                "value": "14/4/2025",
+                "key": 55
+            }
+        ],
+        [
+            {
+                "name": "fechaapertura_aaaa",
+                "value": "2025",
+                "key": 56
+            }
+        ],
+        [
+            {
+                "name": "fechaapertura_dd",
+                "value": "14",
+                "key": 57
+            }
+        ],
+        [
+            {
+                "name": "fechaapertura_ml",
+                "value": "Abril",
+                "key": 58
+            }
+        ],
+        [
+            {
+                "name": "frecuencia_de_pagos",
+                "value": "MENSUAL",
+                "key": 59
+            }
+        ],
+        [
+            {
+                "name": "gerente_sucursal",
+                "value": "EDER MANUEL VALDEZ HERNANDEZ",
+                "key": 60
+            }
+        ],
+        [
+            {
+                "name": "idauxiliar",
+                "value": "5",
+                "key": 61
+            }
+        ],
+        [
+            {
+                "name": "idorigenp",
+                "value": "30257",
+                "key": 62
+            }
+        ],
+        [
+            {
+                "name": "idproducto",
+                "value": "36644",
+                "key": 63
+            }
+        ],
+        [
+            {
+                "name": "idsocio",
+                "value": "305568",
+                "key": 64
+            }
+        ],
+        [
+            {
+                "name": "linea_de_credito1", //linea_de_credito_1
+                "value": "90,266.85",
+                "key": 65
+            }
+        ],
+        [
+            {
+                "name": "linea_de_credito1_letra", //linea_de_credito_1_letra
+                "value": "NOVENTA MIL DOSCIENTOS SESENTA Y SEIS PESOS 85/100 M.N.",
+                "key": 66
+            }
+        ],
+        [
+            {
+                "name": "lugarexp",
+                "value": "Av. Republica Mexicana 401 401, Las Puentes",
+                "key": 67
+            }
+        ],
+        [
+            {
+                "name": "m_enganche_prestamo",
+                "value": "0.0",
+                "key": 68
+            }
+        ],
+        [
+            {
+                "name": "m_enganche_prestamo_letra",
+                "value": "0.0",
+                "key": 69
+            }
+        ],
+        [
+            {
+                "name": "marca_g1",
+                "value": "KIA",
+                "key": 70
+            }
+        ],
+        [
+            {
+                "name": "marca_g2",
+                "value": "CHEVROLET",
+                "key": 71
+            }
+        ],
+        [
+            {
+                "name": "marca_g3",
+                "value": "FORD",
+                "key": 72
+            }
+        ],
+        [
+            {
+                "name": "modelo_g1",
+                "value": "RIO",
+                "key": 73
+            }
+        ],
+        [
+            {
+                "name": "modelo_g2",
+                "value": "AVEO",
+                "key": 74
+            }
+        ],
+        [
+            {
+                "name": "modelo_g3",
+                "value": "FOCUS",
+                "key": 75
+            }
+        ],
+        [
+            {
+                "name": "monto_comision",
+                "value": "0.00",
+                "key": 76
+            }
+        ],
+        [
+            {
+                "name": "monto_comision_letra",
+                "value": "***(CERO PESOS 00/100 M.N.)***",
+                "key": 77
+            }
+        ],
+        [
+            {
+                "name": "montoprestado",
+                "value": "0.00",
+                "key": 78
+            }
+        ],
+        [
+            {
+                "name": "montoprestado_letra",
+                "value": "***(CERO PESOS 00/100 M.N.)***",
+                "key": 79
+            }
+        ],
+        [
+            {
+                "name": "montosolicitado",
+                "value": "100,000.00",
+                "key": 80
+            }
+        ],
+        [
+            {
+                "name": "montosolicitado_letra",
+                "value": "***(CIEN MIL PESOS 00/100 M.N.)***",
+                "key": 81
+            }
+        ],
+        [
+            {
+                "name": "nombre_aval1",
+                "value": "ROLANDO LUCIO RIVERA",
+                "key": 82
+            }
+        ],
+        [
+            {
+                "name": "nombre_aval2",
+                "value": "ELIZABETH LOPEZ ALMAGUER",
+                "key": 83
+            }
+        ],
+        [
+            {
+                "name": "nombre_aval3",
+                "value": "EDNA ARELY CARLOS VAZQUEZ",
+                "key": 84
+            }
+        ],
+        [
+            {
+                "name": "nombre_codeudor",
+                "value": "EDNA ARELY CARLOS VAZQUEZ",
+                "key": 85
+            }
+        ],
+        [
+            {
+                "name": "nombre_gp",
+                "value": "KIA RIO",
+                "key": 86
+            }
+        ],
+        [
+            {
+                "name": "nombre_gp2",
+                "value": "FORD FOCUS",
+                "key": 87
+            }
+        ],
+        [
+            {
+                "name": "nombre_socio",
+                "value": "DIONEI NATANAEL LUCIO LOPEZ",
+                "key": 88
+            }
+        ],
+        [
+            {
+                "name": "nombre_trabajo",
+                "value": "CSN COOPERATIVA FINANCIERA SC DE AP DE RL DE CV",
+                "key": 89
+            }
+        ],
+        [
+            {
+                "name": "nombreprod",
+                "value": "Aniversario CSN Personal",
+                "key": 90
+            }
+        ],
+        [
+            {
+                "name": "num_celular",
+                "value": "8122167739",
+                "key": 91
+            }
+        ],
+        [
+            {
+                "name": "num_cuenta_tdd",
+                "value": "57###000005",
+                "key": 92
+            }
+        ],
+        [
+            {
+                "name": "num_factura_g1",
+                "value": "2374628746",
+                "key": 93
+            }
+        ],
+        [
+            {
+                "name": "num_plastico_tdd",
+                "value": "344364",
+                "key": 94
+            }
+        ],
+        [
+            {
+                "name": "num_motor_g1",
+                "value": "456456",
+                "key": 95
+            }
+        ],
+        [
+            {
+                "name": "num_motor_g2",
+                "value": "34546456",
+                "key": 96
+            }
+        ],
+        [
+            {
+                "name": "num_motor_g3",
+                "value": "4563457",
+                "key": 97
+            }
+        ],
+        [
+            {
+                "name": "numserie_g1",
+                "value": "764567",
+                "key": 98
+            }
+        ],
+        [
+            {
+                "name": "numserie_g2",
+                "value": "5685678",
+                "key": 99
+            }
+        ],
+        [
+            {
+                "name": "numserie_g3",
+                "value": "GFJ56756",
+                "key": 100
+            }
+        ],
+        [
+            {
+                "name": "ogs_aval1_o-g-s", //ogs_aval1
+                "value": "030214-10-304475",
+                "key": 101
+            }
+        ],
+        [
+            {
+                "name": "ogs_aval2_o-g-s", //ogs_aval2
+                "value": "030214-10-304475",
+                "key": 102
+            }
+        ],
+        [
+            {
+                "name": "ogs_codeudor",
+                "value": "030214-10-304475",
+                "key": 103
+            }
+        ],
+        [
+            {
+                "name": "ogs",
+                "value": "030213-10-305568",
+                "key": 104
+            }
+        ],
+        [
+            {
+                "name": "otros_conceptos_g1", //otros_conceptos
+                "value": "AUTO NUEVO",
+                "key": 105
+            }
+        ],
+        [
+            {
+                "name": "placas_g2",
+                "value": "HGJHG466",
+                "key": 106
+            }
+        ],
+        [
+            {
+                "name": "placas_g3",
+                "value": "JHGJK456",
+                "key": 107
+            }
+        ],
+        [
+            {
+                "name": "plazo_en_dias",
+                "value": "1822",
+                "key": 108
+            }
+        ],
+        [
+            {
+                "name": "porcentaje_comision",
+                "value": "0.0000",
+                "key": 109
+            }
+        ],
+        [
+            {
+                "name": "porcentaje_comision_letra",
+                "value": "CERO POR CIENTO",
+                "key": 110
+            }
+        ],
+        [
+            {
+                "name": "porcentaje_comision2",
+                "value": "0.00",
+                "key": 111
+            }
+        ],
+        [
+            {
+                "name": "propietario_g1",
+                "value": "DIONEI NATANAEL LUCIO LOPEZ",
+                "key": 112
+            }
+        ],
+        [
+            {
+                "name": "propietario_g2",
+                "value": "EDNA ARELY VAZQUEZ",
+                "key": 113
+            }
+        ],
+        [
+            {
+                "name": "propietario_g3",
+                "value": "ROLANDO LUCIO RIVERA",
+                "key": 114
+            }
+        ],
+        [
+            {
+                "name": "propietario",
+                "value": "DIONEI NATANAEL LUCIO LOPEZ",
+                "key": 115
+            }
+        ],
+        [
+            {
+                "name": "puertas_g1",
+                "value": "4",
+                "key": 116
+            }
+        ],
+        [
+            {
+                "name": "reca_recortado_p_64_D",
+                "value": "7368572368756",
+                "key": 117
+            }
+        ],
+        [
+            {
+                "name": "reca_recortado_p_74_D",
+                "value": "32463457",
+                "key": 118
+            }
+        ],
+        [
+            {
+                "name": "reca_recortado_p_79_D",
+                "value": "457568456865",
+                "key": 119
+            }
+        ],
+        [
+            {
+                "name": "reca_recortado_p_84_D",
+                "value": "56484679467",
+                "key": 120
+            }
+        ],
+        [
+            {
+                "name": "rellenar",
+                "value": "<rellenar|>",
+                "key": 121
+            }
+        ],
+        [
+            {
+                "name": "rfc_codeudor",
+                "value": "LULD941215828",
+                "key": 122
+            }
+        ],
+        [
+            {
+                "name": "rfc",
+                "value": "LULD941215828",
+                "key": 123
+            }
+        ],
+        [
+            {
+                "name": "simbolo_porcentaje",
+                "value": "%",
+                "key": 124
+            }
+        ],
+        [
+            {
+                "name": "tasaim_anual",
+                "value": "48.0000",
+                "key": 125
+            }
+        ],
+        [
+            {
+                "name": "tasaim_anual2", //tasaim_anual_2
+                "value": "48.00",
+                "key": 126
+            }
+        ],
+        [
+            {
+                "name": "tasaim_anual_letra",
+                "value": "CUARENTA Y OCHO POR CIENTO",
+                "key": 127
+            }
+        ],
+        [
+            {
+                "name": "tasaio_anual",
+                "value": "19.5000",
+                "key": 128
+            }
+        ],
+        [
+            {
+                "name": "tasaio_anual_letra",
+                "value": "DIECINUEVE PUNTO CINCUENTA POR CIENTO",
+                "key": 129
+            }
+        ],
+        [
+            {
+                "name": "tasaio_anual2",
+                "value": "19.50",
+                "key": 130
+            }
+        ],
+        [
+            {
+                "name": "tasaio_anual2_letra",
+                "value": "DIECINUEVE PUNTO CINCUENTA POR CIENTO",
+                "key": 131
+            }
+        ],
+        [
+            {
+                "name": "telefono_aval1",
+                "value": "8122167739",
+                "key": 132
+            }
+        ],
+        [
+            {
+                "name": "telefono_aval2",
+                "value": "8122167766",
+                "key": 133
+            }
+        ],
+        [
+            {
+                "name": "telefono_codeudor",
+                "value": "8122167799",
+                "key": 134
+            }
+        ],
+        [
+            {
+                "name": "telefono",
+                "value": "8183836332 (Recados) 8122167739",
+                "key": 135
+            }
+        ],
+        [
+            {
+                "name": "tipo_g1",
+                "value": "ESTANDAR",
+                "key": 136
+            }
+        ],
+        [
+            {
+                "name": "tipo_g2",
+                "value": "ESTANDAR",
+                "key": 137
+            }
+        ],
+        [
+            {
+                "name": "tipo_g3",
+                "value": "ESTANDAR",
+                "key": 138
+            }
+        ],
+        [
+            {
+                "name": "direccion_colonia",
+                "value": "RESIDENCIAL LAS PUENTES SAN NICOLAS DE LOS GARZA",
+                "key": 139
+            }
+        ],
+        [
+            {
+                "name": "finalidad",
+                "value": "Mantenimiento a Automovil",
+                "key": 140
+            }
+        ],
+        [
+            {
+                "name": "placas_g1",
+                "value": "HGJHKG45747",
+                "key": 141
+            }
+        ],
+        [
+            {
+                "name": "direccion_codeudor",
+                "value": "RESIDENCIA LAS PALMAS",
+                "key": 142
+            }
+        ],
+        [
+            {
+                "name": "direccion_codeudor_colonia", //direccion_codeudor|colonia
+                "value": "LAS PALMAS",
+                "key": 143
+            }
+        ],
+        [
+            {
+                "name": "direccion_codeudor_completa", //direccion_codeudor|completa
+                "value": "CALLE OMECA RESIDENCIA LAS PALMAS",
+                "key": 144
+            }
+        ],
+        [
+            {
+                "name": "direccion_codeudor_municipio", //direccion_codeudor|municipio
+                "value": "SAN NICOLAS DE LOS GARZA",
+                "key": 145
+            }
+        ],
+        [
+            {
+                "name": "reca_recortado_p",
+                "value": "32I872562438756",
+                "key": 146
+            }
+        ]
+    ]
+}

@@ -11,7 +11,8 @@ import java.io.Serializable;
 @NoArgsConstructor
 public class ConfirmaIdentidadReqVo implements Serializable {
 
-    private String ididentidad;
+    private String id;
+    private boolean estatus;
 
     private static final long serialVersionUID = 1L;
 }

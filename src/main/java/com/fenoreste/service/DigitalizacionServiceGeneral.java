@@ -184,9 +184,9 @@ public class DigitalizacionServiceGeneral {
         DigitalDoc digitalDoc = new DigitalDoc();
         try {
             CrearDReqVo crearDReqVo = new CrearDReqVo();
-            digitalDoc = digitalDocService.buscaPorIdIdentidad(confirmaIdentidadReqVo.getIdidentidad());
+            digitalDoc = digitalDocService.buscaPorIdIdentidad(confirmaIdentidadReqVo.getId());
 
-            if (digitalDoc != null) {
+            if (digitalDoc != null && digitalDoc.getIdidentidad().isEmpty()) {
                 log.info("Se encuentra la identidad");
                 digitalDocService.insertarDigitalDoc(digitalDoc);
                 //Una ves guardada la identidad vamos a enviar las variables para el documento
