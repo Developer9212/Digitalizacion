@@ -444,7 +444,7 @@ public class DigitalizacionServiceGeneral {
                     confirmaIdentidadVo.setMessage("Recibido");
                     digitalDoc.setStatus("Firmado correctamente");
                     digitalDoc.setFirmado(true);
-
+                    digitalDoc.setMensajeFinal("Proceso terminado con exito");
                     log.info("::::::::::Recibido correctamente:::::::::");
                 } else {
                     confirmaIdentidadVo.setSucces(false);
