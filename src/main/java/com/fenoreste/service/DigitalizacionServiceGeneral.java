@@ -186,7 +186,7 @@ public class DigitalizacionServiceGeneral {
             CrearDReqVo crearDReqVo = new CrearDReqVo();
             digitalDoc = digitalDocService.buscaPorIdIdentidad(confirmaIdentidadReqVo.getId());
 
-            if (digitalDoc != null && digitalDoc.getIdidentidad().isEmpty()) {
+            if (digitalDoc != null) {
                 log.info("Se encuentra la identidad");
                 digitalDocService.insertarDigitalDoc(digitalDoc);
                 //Una ves guardada la identidad vamos a enviar las variables para el documento
@@ -435,21 +435,24 @@ public class DigitalizacionServiceGeneral {
             JSONObject json = new JSONObject(cadena);
             JSONObject jsonObject = json.getJSONObject("document");
             String idDoctoFirmado = jsonObject.getString("id");
+            boolean completed  = jsonObject.getBoolean("completed");
 
-            if (!idDoctoFirmado.isEmpty()) {
+            if (!idDoctoFirmado.isEmpty() && completed) {
                 DigitalDoc digitalDoc = digitalDocService.buscaPorIdDocto(idDoctoFirmado);
                 if (digitalDoc != null) {
                     confirmaIdentidadVo.setSucces(true);
                     confirmaIdentidadVo.setMessage("Recibido");
                     digitalDoc.setStatus("Firmado correctamente");
                     digitalDoc.setFirmado(true);
-                    digitalDocService.insertarDigitalDoc(digitalDoc);
+
                     log.info("::::::::::Recibido correctamente:::::::::");
                 } else {
                     confirmaIdentidadVo.setSucces(false);
                     confirmaIdentidadVo.setMessage("No se encuentra el iddocumento firmado");
+                    digitalDoc.setMensajeFinal("Documento no existe");
                     log.info("::::::::::::::::::No se encuentra el documento firmado::::::::::::::");
                 }
+                digitalDocService.insertarDigitalDoc(digitalDoc);
             }
         } catch (Exception e) {
             log.info(":::::::::::::Error al recibidor notificacion documento firmado:::::::::::");

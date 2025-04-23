@@ -38,7 +38,7 @@ public class WebHookController {
             JsonObject jsonDocument = json.getAsJsonObject("document");
             confirma.setId(jsonDocument.get("id").getAsString());
             confirma.setEstatus(jsonDocument.get("completed").getAsBoolean());
-            return digitalizacionService.confirmaIdentidadVo(confirma);
+            return digitalizacionService.confirmaFirmacontrato(cadena);
         }
         return null;
     }
