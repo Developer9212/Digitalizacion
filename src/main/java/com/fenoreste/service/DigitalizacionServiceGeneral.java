@@ -73,7 +73,7 @@ public class DigitalizacionServiceGeneral {
                     int idx = random.nextInt(CHARACTERS.length());
                     sb.append(CHARACTERS.charAt(idx));
                 }
-                String correo ="julio" + sb.toString() + "@gmail.com";
+                String correo = persona.getEmail();//"julio" + sb.toString() + "@gmail.com";
 
                 log.info("El correo es " + correo);
 
