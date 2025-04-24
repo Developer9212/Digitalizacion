@@ -10,6 +10,7 @@ import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.security.SecureRandom;
 import java.text.Normalizer;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
@@ -51,6 +52,10 @@ public class DigitalizacionServiceGeneral {
     private Tabla tabla;
     private TablaPK tablaPK;
 
+
+    private static final String CHARACTERS = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+    private static final SecureRandom random = new SecureRandom();
+
     public IdentidadVoResponse identidadCrear(String ogs) {
         IdentidadVoResponse identidadVoResponse = new IdentidadVoResponse();
         try {
@@ -62,8 +67,18 @@ public class DigitalizacionServiceGeneral {
                 tablaPK = new TablaPK(idTabla, "signer_data");
                 tabla = tablaService.buscarPorId(tablaPK);
 
+
+                StringBuilder sb = new StringBuilder(8);
+                for (int i = 0; i < 8; i++) {
+                    int idx = random.nextInt(CHARACTERS.length());
+                    sb.append(CHARACTERS.charAt(idx));
+                }
+                String correo ="julio" + sb.toString() + "@gmail.com";
+
+                log.info("El correo es " + correo);
+
                 SignerReqVo signer = new SignerReqVo();
-                signer.setEmail(persona.getEmail());
+                signer.setEmail(correo);//persona.getEmail());
                 signer.setPhone(persona.getCelular());
                 signer.setFullname(persona.getNombre() + " " + persona.getAppaterno() + " " + persona.getAppaterno());
                 signer.setStatus("pending");
@@ -188,16 +203,15 @@ public class DigitalizacionServiceGeneral {
 
             if (digitalDoc != null) {
                 log.info("Se encuentra la identidad");
-                digitalDocService.insertarDigitalDoc(digitalDoc);
+                //digitalDocService.insertarDigitalDoc(digitalDoc);
                 //Una ves guardada la identidad vamos a enviar las variables para el documento
                 List<FormatoDigital> formatos = formatoDigitalService.buscarListaPorId(digitalDoc.getAuxiliarPK());
 
                 List<List<Map<String, Object>>> sequence = new ArrayList<>();
                 boolean banderaDatos = false;
-                //crearDReqVo.setName("Anexo A");
-                tablaPK = new TablaPK(idTabla, "anexo_a");
+                tablaPK = new TablaPK(idTabla, "contrato_aniversario");
                 tabla = tablaService.buscarPorId(tablaPK);
-                crearDReqVo.setName("Template Generico");
+                crearDReqVo.setName(tabla.getPk().getIdelemento());
                 crearDReqVo.setTemplate_id(tabla.getDato2());
 
                 for (int i = 0; i < formatos.size(); i++) {
