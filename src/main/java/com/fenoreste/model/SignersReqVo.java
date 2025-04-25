@@ -15,6 +15,7 @@ public class SignersReqVo implements Serializable {
    private String document_id;
    private boolean workflow;
    private boolean use_whatsapp;
+   private boolean send_invite = true;
    private List<Signer> signers;
 
 

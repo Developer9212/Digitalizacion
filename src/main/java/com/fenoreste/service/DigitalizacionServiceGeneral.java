@@ -414,6 +414,7 @@ public class DigitalizacionServiceGeneral {
                         signersReqVo.setSigners(signers);
                         log.info("::::::::::::Vamos a enviar a firmantes:::::::::::::::");
                         System.out.println(":::::::Tu peticion:::"+signersReqVo);
+                        signersReqVo.setSend_invite(true);
                         ResSignersVo signerResVo = apisHttp.firmantes(signersReqVo);
                         resSignersVo.setMessage(signerResVo.getMessage());
                         resSignersVo.setSuccess(true);
