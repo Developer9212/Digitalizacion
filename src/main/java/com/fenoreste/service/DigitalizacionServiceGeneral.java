@@ -366,7 +366,6 @@ public class DigitalizacionServiceGeneral {
                         signers.add(signer);
                     }
 
-                    System.out.println("padso asasdasodso");
                     if (!ogsCodeudor.isEmpty()) {
                         ogsVo = util.ogs(ogsCodeudor);
                         personaPK = new PersonaPK(ogsVo.getIdorigen(), ogsVo.getIdgrupo(), ogsVo.getIdsocio());
@@ -376,7 +375,9 @@ public class DigitalizacionServiceGeneral {
                         signer.setRole("FIRMANTE");
                         signer.setType("FIRMA");
                         signers.add(signer);
-                    } else if (!ogsAval1.isEmpty()) {
+                    }
+
+                    if (!ogsAval1.isEmpty()) {
                         ogsVo = util.ogs(ogsAval1);
                         personaPK = new PersonaPK(ogsVo.getIdorigen(), ogsVo.getIdgrupo(), ogsVo.getIdsocio());
                         persona = personaService.buscarPorId(personaPK);
@@ -385,16 +386,9 @@ public class DigitalizacionServiceGeneral {
                         signer.setRole("FIRMANTE");
                         signer.setType("FIRMA");
                         signers.add(signer);
-                    } else if (!ogsAval2.isEmpty()) {
-                        ogsVo = util.ogs(ogsAval2);
-                        personaPK = new PersonaPK(ogsVo.getIdorigen(), ogsVo.getIdgrupo(), ogsVo.getIdsocio());
-                        persona = personaService.buscarPorId(personaPK);
-                        signer.setEmail(persona.getEmail());
-                        signer.setFullname(persona.getNombre() + " " + persona.getAppaterno() + " " + persona.getApmaterno());
-                        signer.setRole("FIRMANTE");
-                        signer.setType("FIRMA");
-                        signers.add(signer);
-                    }else if (!ogsAval3.isEmpty()) {
+                    }
+
+                    if (!ogsAval2.isEmpty()) {
                         ogsVo = util.ogs(ogsAval2);
                         personaPK = new PersonaPK(ogsVo.getIdorigen(), ogsVo.getIdgrupo(), ogsVo.getIdsocio());
                         persona = personaService.buscarPorId(personaPK);
@@ -405,8 +399,16 @@ public class DigitalizacionServiceGeneral {
                         signers.add(signer);
                     }
 
-
-                    log.info("::::::::::Req:"+resSignersVo);
+                    if (!ogsAval3.isEmpty()) {
+                        ogsVo = util.ogs(ogsAval3);
+                        personaPK = new PersonaPK(ogsVo.getIdorigen(), ogsVo.getIdgrupo(), ogsVo.getIdsocio());
+                        persona = personaService.buscarPorId(personaPK);
+                        signer.setEmail(persona.getEmail());
+                        signer.setFullname(persona.getNombre() + " " + persona.getAppaterno() + " " + persona.getApmaterno());
+                        signer.setRole("FIRMANTE");
+                        signer.setType("FIRMA");
+                        signers.add(signer);
+                    }
 
                     signersReqVo.setSigners(signers);
 
