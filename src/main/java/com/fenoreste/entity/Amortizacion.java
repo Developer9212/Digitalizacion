@@ -25,13 +25,15 @@ import java.util.Date;
 @NoArgsConstructor
 @AllArgsConstructor
 @Data
+
 public class Amortizacion implements Serializable {   
 
 
-    
-	@EmbeddedId AuxiliarPK pk;
-	@Column(name="idamortizacion")
-    private Integer id;        
+    @Id
+    private Integer idamortizacion;
+    private Integer idorigenp;
+    private Integer idproducto;
+    private Integer idauxiliar;
     @Column(name = "vence")
     @Temporal(TemporalType.DATE)
     private Date vence;

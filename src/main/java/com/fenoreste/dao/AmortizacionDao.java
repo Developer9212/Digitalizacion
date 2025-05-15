@@ -7,12 +7,15 @@ import org.springframework.data.jpa.repository.Query;
 
 import java.util.List;
 
-public interface AmortizacionDao extends JpaRepository<Amortizacion,AuxiliarPK> {
+import javax.persistence.OrderBy;
+
+public interface AmortizacionDao extends JpaRepository<Amortizacion,Integer> {
 
 	@Query(value = "SELECT * FROM amortizaciones a WHERE a.idorigenp=?1 AND a.idproducto=?2 AND a.idauxiliar=?3 ORDER BY vence ASC LIMIT 1",nativeQuery = true)
 	public Amortizacion buscarPrimeraAmortizacion(Integer idorigenp,Integer idproducto,Integer idauxiliar);
-	public List<Amortizacion>findBypkAndTodopag(AuxiliarPK pk,Boolean estatus);
 	@Query(value = "SELECT * FROM amortizaciones a WHERE a.idorigenp=?1 AND a.idproducto=?2 AND a.idauxiliar=?3 ORDER BY vence DESC LIMIT 1",nativeQuery = true)
 	public Amortizacion buscarUltimaAmortizacion(Integer idorigenp,Integer idproducto,Integer idauxiliar);
-	public List<Amortizacion>findBypk(AuxiliarPK pk);
+	
+	@Query(value="SELECT * FROM  amortizaciones a WHERE a.idorigenp=?1 AND a.idproducto=?2 AND a.idauxiliar=?3 ORDER BY vence ASC",nativeQuery=true)
+	public List<Amortizacion> todasPorOpa(Integer idorigenp,Integer idproducto,Integer idauxiliar);
 }

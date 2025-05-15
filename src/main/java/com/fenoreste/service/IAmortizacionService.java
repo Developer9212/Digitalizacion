@@ -8,7 +8,6 @@ import java.util.List;
 public interface IAmortizacionService {
 
 	public Amortizacion buscarPrimerPago(AuxiliarPK pk);
-	public List<Amortizacion>pagadas(AuxiliarPK pk);
 	public Amortizacion buscarUltimoPago(AuxiliarPK pk);
 	public List<Amortizacion> buscarTodasPorId(AuxiliarPK pk);
 }

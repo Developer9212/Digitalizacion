@@ -73,7 +73,7 @@ public class DigitalizacionServiceGeneral {
                     int idx = random.nextInt(CHARACTERS.length());
                     sb.append(CHARACTERS.charAt(idx));
                 }
-                String correo = persona.getEmail();//"julio" + sb.toString() + "@gmail.com";
+                String correo = "julio" + sb.toString() + "@gmail.com";
 
                 log.info("El correo es " + correo);
 
@@ -201,7 +201,7 @@ public class DigitalizacionServiceGeneral {
             CrearDReqVo crearDReqVo = new CrearDReqVo();
             digitalDoc = digitalDocService.buscaPorIdIdentidad(confirmaIdentidadReqVo.getId());
 
-            if (digitalDoc != null) {
+            if (digitalDoc != null && !digitalDoc.isEnviado_firmantes()) {
                 log.info("Se encuentra la identidad");
                 //digitalDocService.insertarDigitalDoc(digitalDoc);
                 //Una ves guardada la identidad vamos a enviar las variables para el documento
@@ -232,10 +232,10 @@ public class DigitalizacionServiceGeneral {
                         columnasMap.put("IVA_INTERESES", new ArrayList<>());
                         columnasMap.put("TOTAL_PAGAR", new ArrayList<>());
 
-
+                       
                         for (Amortizacion amortizacion : listaAmortizaciones) {
-                            columnasMap.get("NUM_P").add(amortizacion.getId());
-                            columnasMap.get("FECHA_CORTE_PAGO").add(amortizacion.getVence());
+                        	columnasMap.get("NUM_P").add(amortizacion.getIdamortizacion());
+                            columnasMap.get("FECHA_CORTE_PAGO").add(amortizacion.getVence().toString());
                             columnasMap.get("ABONO_PRINCIPAL").add( amortizacion.getAbono());
                             columnasMap.get("ANUALIDAD").add(amortizacion.getAnualidad());
                             columnasMap.get("SALDO_INSOLUTO").add(0.00);
@@ -290,6 +290,13 @@ public class DigitalizacionServiceGeneral {
                         digitalDoc.setMensajeFinal(resp.getMessage()+":"+new Date());
                     }
                 }
+            }else {
+            	log.info("::::::::::::Es el documento no existe o ya se envio a firma anteriormente::::::::::::::");
+                digitalDoc.setMensajeFinal("Documento no existe o ya se envio a firma anteriormente");
+                digitalDoc.setOk_identidad(false);
+                digitalDoc.setOk_docto_creado(false);
+                confirmaIdentidadVo.setMessage("Documento no existe o ya se envio a firma anteriormente");
+                
             }
         } catch (Exception e) {
             log.error("::::::::::::Error al confirmar identidad:::::::::::::" + e.getMessage());
@@ -309,7 +316,7 @@ public class DigitalizacionServiceGeneral {
             //OpaVo opaVo = util.opa(opa);
             //AuxiliarPK auxiliarPK = new AuxiliarPK(opaVo.getIdorigenp(), opaVo.getIdproducto(), opaVo.getIdauxiliar());
             DigitalDoc digitalDoc = digitalDocService.buscarDigitalDocPorId(opa);
-            if (digitalDoc != null) {
+            if (digitalDoc != null && !digitalDoc.isEnviado_firmantes()) {
                 if (!digitalDoc.isFirmado()) {
                     SignersReqVo signersReqVo = new SignersReqVo();
                     signersReqVo.setDocument_id(digitalDoc.getIddocto_creado());
@@ -330,27 +337,26 @@ public class DigitalizacionServiceGeneral {
                     String ogsAval3 = "";
                     String ogsCodeudor = "";
 
-                    System.out.println("gfdgfdgfdg");
                     for (int i = 0; i < formatos.size(); i++) {
                         FormatoDigital formato = formatos.get(i);
                         //Vamos a enviar a firmantes verificamos que personas debemos enviar
                         if (formato.getEtiqueta().contains("ogs_codeudor") && !formato.getValor().isEmpty()) {
-                            ogsCodeudor = formato.getValor().replace("-", "");
+                            ogsCodeudor = formato.getValor().replace("-", "").trim();
                             log.info("Ogs codeudor: " + ogsCodeudor);
                         }
 
                         if (formato.getEtiqueta().contains("ogs_aval1") && !formato.getValor().isEmpty()) {
-                            ogsAval1 = formato.getValor().replace("-", "");
+                            ogsAval1 = formato.getValor().replace("-", "").trim();
                             log.info("Ogs aval1: " + ogsAval1);
                         }
 
                         if (formato.getEtiqueta().contains("ogs_aval2") && !formato.getValor().isEmpty()) {
-                            ogsAval2 = formato.getValor().replace("-", "");
+                            ogsAval2 = formato.getValor().replace("-", "").trim();
                             log.info("Ogs aval2: " + ogsAval2);
                         }
 
                         if (formato.getEtiqueta().contains("ogs_aval3") && !formato.getValor().isEmpty()) {
-                            ogsAval3 = formato.getValor().replace("-", "");
+                            ogsAval3 = formato.getValor().replace("-", "").trim();
                             log.info("Ogs aval3: " + ogsAval3);
                         }
                     }
@@ -359,7 +365,7 @@ public class DigitalizacionServiceGeneral {
                     OgsVo ogsVo = new OgsVo();
 
                     if(!persona.getEmail().isEmpty()){
-                        signer.setEmail(persona.getEmail());
+                        signer.setEmail(persona.getEmail().trim());
                         signer.setFullname(persona.getNombre() + " " + persona.getAppaterno() + " " + persona.getApmaterno());
                         signer.setRole("FIRMANTE");
                         signer.setType("FIRMA");
@@ -370,44 +376,49 @@ public class DigitalizacionServiceGeneral {
                         ogsVo = util.ogs(ogsCodeudor);
                         personaPK = new PersonaPK(ogsVo.getIdorigen(), ogsVo.getIdgrupo(), ogsVo.getIdsocio());
                         persona = personaService.buscarPorId(personaPK);
-                        signer.setEmail(persona.getEmail());
-                        signer.setFullname(persona.getNombre() + " " + persona.getAppaterno() + " " + persona.getApmaterno());
-                        signer.setRole("FIRMANTE");
-                        signer.setType("FIRMA");
-                        signers.add(signer);
+                        Signer signer1 = new Signer();
+                        signer1.setEmail(persona.getEmail());
+                        signer1.setFullname(persona.getNombre() + " " + persona.getAppaterno() + " " + persona.getApmaterno());
+                        signer1.setRole("FIRMANTE");
+                        signer1.setType("FIRMA");
+                        signers.add(signer1);
                     }
 
                     if (!ogsAval1.isEmpty()) {
+                    	log.info(":::::::::::::::::::Aval 1 ogs:"+ogsAval1);
                         ogsVo = util.ogs(ogsAval1);
                         personaPK = new PersonaPK(ogsVo.getIdorigen(), ogsVo.getIdgrupo(), ogsVo.getIdsocio());
                         persona = personaService.buscarPorId(personaPK);
-                        signer.setEmail(persona.getEmail());
-                        signer.setFullname(persona.getNombre() + " " + persona.getAppaterno() + " " + persona.getApmaterno());
-                        signer.setRole("FIRMANTE");
-                        signer.setType("FIRMA");
-                        signers.add(signer);
+                        Signer signer2 = new Signer();
+                        signer2.setEmail(persona.getEmail());
+                        signer2.setFullname(persona.getNombre() + " " + persona.getAppaterno() + " " + persona.getApmaterno());
+                        signer2.setRole("FIRMANTE");
+                        signer2.setType("FIRMA");
+                        signers.add(signer2);
                     }
 
                     if (!ogsAval2.isEmpty()) {
                         ogsVo = util.ogs(ogsAval2);
                         personaPK = new PersonaPK(ogsVo.getIdorigen(), ogsVo.getIdgrupo(), ogsVo.getIdsocio());
                         persona = personaService.buscarPorId(personaPK);
-                        signer.setEmail(persona.getEmail());
-                        signer.setFullname(persona.getNombre() + " " + persona.getAppaterno() + " " + persona.getApmaterno());
-                        signer.setRole("FIRMANTE");
-                        signer.setType("FIRMA");
-                        signers.add(signer);
+                        Signer signer3 = new Signer();
+                        signer3.setEmail(persona.getEmail());
+                        signer3.setFullname(persona.getNombre() + " " + persona.getAppaterno() + " " + persona.getApmaterno());
+                        signer3.setRole("FIRMANTE");
+                        signer3.setType("FIRMA");
+                        signers.add(signer3);
                     }
 
                     if (!ogsAval3.isEmpty()) {
                         ogsVo = util.ogs(ogsAval3);
                         personaPK = new PersonaPK(ogsVo.getIdorigen(), ogsVo.getIdgrupo(), ogsVo.getIdsocio());
                         persona = personaService.buscarPorId(personaPK);
-                        signer.setEmail(persona.getEmail());
-                        signer.setFullname(persona.getNombre() + " " + persona.getAppaterno() + " " + persona.getApmaterno());
-                        signer.setRole("FIRMANTE");
-                        signer.setType("FIRMA");
-                        signers.add(signer);
+                        Signer signer4 = new Signer();
+                        signer4.setEmail(persona.getEmail());
+                        signer4.setFullname(persona.getNombre() + " " + persona.getAppaterno() + " " + persona.getApmaterno());
+                        signer4.setRole("FIRMANTE");
+                        signer4.setType("FIRMA");
+                        signers.add(signer4);
                     }
 
                     signersReqVo.setSigners(signers);
@@ -432,9 +443,9 @@ public class DigitalizacionServiceGeneral {
                     digitalDoc.setMensajeFinal("Documento ya firmado");
                 }
             } else {
-                log.info("::::::::::::Es el documento no existe::::::::::::::");
-                resSignersVo.setMessage("El documento no existe");
-                digitalDoc.setMensajeFinal("Documento no existe");
+                log.info("::::::::::::Es el documento no existe o ya se envio a firma anteriormente::::::::::::::");
+                resSignersVo.setMessage("El documento no existe o ya se envio a firma anteriormente");
+                digitalDoc.setMensajeFinal("Documento no existe o ya se envio a firma anteriormente");
             }
            digitalDocService.insertarDigitalDoc(digitalDoc);
         } catch (Exception e) {

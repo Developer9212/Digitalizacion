@@ -20,10 +20,7 @@ public class AmortizacionServiceImpl implements IAmortizacionService{
 		return amortizacionDao.buscarPrimeraAmortizacion(pk.getIdorigenp(),pk.getIdproducto(),pk.getIdauxiliar());
 	}
 
-	@Override
-	public List<Amortizacion> pagadas(AuxiliarPK pk) {
-		return amortizacionDao.findBypkAndTodopag(pk,true);
-	}
+	
 
 	@Override
 	public Amortizacion buscarUltimoPago(AuxiliarPK pk) {
@@ -32,7 +29,7 @@ public class AmortizacionServiceImpl implements IAmortizacionService{
 
 	@Override
 	public List<Amortizacion> buscarTodasPorId(AuxiliarPK pk) {
-		return amortizacionDao.findBypk(pk);
+		return amortizacionDao.todasPorOpa(pk.getIdorigenp(), pk.getIdproducto(),pk.getIdauxiliar());
 	}
 
 }
