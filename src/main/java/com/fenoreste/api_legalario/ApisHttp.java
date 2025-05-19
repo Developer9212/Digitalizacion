@@ -201,6 +201,7 @@ public class ApisHttp {
 
             response = client.newCall(request).execute();
             resultado = response.body().string();
+            log.info(":::::::::::Resultado HTTP al crear documento:::::::::::::::::" + resultado + "," + crearDocumento);
             Gson gson = new Gson();
             JsonObject res = gson.fromJson(resultado, JsonObject.class);
 
