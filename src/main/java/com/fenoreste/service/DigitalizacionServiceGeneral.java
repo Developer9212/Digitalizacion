@@ -56,59 +56,162 @@ public class DigitalizacionServiceGeneral {
     private static final String CHARACTERS = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
     private static final SecureRandom random = new SecureRandom();
 
-    public IdentidadVoResponse identidadCrear(String ogs) {
+    public IdentidadVoResponse identidadCrear(String ogs, String opa) {
         IdentidadVoResponse identidadVoResponse = new IdentidadVoResponse();
         try {
-            OgsVo ogsVo = util.ogs(ogs);
-            PersonaPK personaPK = new PersonaPK(ogsVo.getIdorigen(), ogsVo.getIdgrupo(), ogsVo.getIdsocio());
-            Persona persona = personaService.buscarPorId(personaPK);
 
-            if (persona != null) {
-                tablaPK = new TablaPK(idTabla, "signer_data");
-                tabla = tablaService.buscarPorId(tablaPK);
+            OpaVo opaVo = util.opa(opa);
+            AuxiliarPK auxiliarPK = new AuxiliarPK(opaVo.getIdorigenp(), opaVo.getIdproducto(), opaVo.getIdauxiliar());
+            List<FormatoDigital> formatos = formatoDigitalService.buscarListaPorId(auxiliarPK);
+            if (!formatos.isEmpty()) {
+                OgsVo ogsVo = util.ogs(ogs);
+                PersonaPK personaPK = new PersonaPK(ogsVo.getIdorigen(), ogsVo.getIdgrupo(), ogsVo.getIdsocio());
+                Persona persona = personaService.buscarPorId(personaPK);
+
+                if (persona != null) {
+                    tablaPK = new TablaPK(idTabla, "signer_data");
+                    tabla = tablaService.buscarPorId(tablaPK);
+                    StringBuilder sb = new StringBuilder(8);
+                    for (int i = 0; i < 8; i++) {
+                        int idx = random.nextInt(CHARACTERS.length());
+                        sb.append(CHARACTERS.charAt(idx));
+                    }
+                    String correo = persona.getEmail();//"julio" + sb.toString() + "@gmail.com";
+
+                    log.info("El correo es " + correo);
+
+                    SignerReqVo signer = new SignerReqVo();
+                    signer.setEmail(correo);//persona.getEmail());
+                    signer.setPhone(persona.getCelular());
+                    signer.setFullname(persona.getNombre() + " " + persona.getAppaterno() + " " + persona.getAppaterno());
+                    signer.setStatus("pending");
+                    signer.setStatus_identity("active");
+                    signer.setFlow_id(tabla.getDato3());
+                    signer.setOrganization_id(tabla.getDato2());
+
+                    SignersVoReq signersVoReq = new SignersVoReq();
+                    List<SignerReqVo> lista = new ArrayList<>();
+                    lista.add(signer);
+
+                    String ogsAval1 = "";
+                    String ogsAval2 = "";
+                    String ogsAval3 = "";
+                    String ogsCodeudor = "";
+
+                    for (int i = 0; i < formatos.size(); i++) {
+                        FormatoDigital formato = formatos.get(i);
+                        //Vamos a enviar a firmantes verificamos que personas debemos enviar
+                        if (formato.getEtiqueta().contains("ogs_codeudor") && !formato.getValor().isEmpty()) {
+                            ogsCodeudor = formato.getValor().replace("-", "").trim();
+                            log.info("Ogs codeudor: " + ogsCodeudor);
+                        }
+
+                        if (formato.getEtiqueta().contains("ogs_aval1") && !formato.getValor().isEmpty()) {
+                            ogsAval1 = formato.getValor().replace("-", "").trim();
+                            log.info("Ogs aval1: " + ogsAval1);
+                        }
+
+                        if (formato.getEtiqueta().contains("ogs_aval2") && !formato.getValor().isEmpty()) {
+                            ogsAval2 = formato.getValor().replace("-", "").trim();
+                            log.info("Ogs aval2: " + ogsAval2);
+                        }
+
+                        if (formato.getEtiqueta().contains("ogs_aval3") && !formato.getValor().isEmpty()) {
+                            ogsAval3 = formato.getValor().replace("-", "").trim();
+                            log.info("Ogs aval3: " + ogsAval3);
+                        }
+                    }
 
 
-                StringBuilder sb = new StringBuilder(8);
-                for (int i = 0; i < 8; i++) {
-                    int idx = random.nextInt(CHARACTERS.length());
-                    sb.append(CHARACTERS.charAt(idx));
-                }
-                String correo = persona.getEmail();//"julio" + sb.toString() + "@gmail.com";
+                    if(!ogsCodeudor.isEmpty()){
+                        ogsVo = util.ogs(ogsCodeudor);
+                        personaPK = new PersonaPK(ogsVo.getIdorigen(), ogsVo.getIdgrupo(), ogsVo.getIdsocio());
+                        persona = personaService.buscarPorId(personaPK);
+                        SignerReqVo signerCodeudor = new SignerReqVo();
 
-                log.info("El correo es " + correo);
+                        signerCodeudor.setEmail(persona.getEmail());
+                        signerCodeudor.setPhone(persona.getCelular());
+                        signerCodeudor.setFullname(persona.getNombre() + " " + persona.getAppaterno() + " " + persona.getAppaterno());
+                        signerCodeudor.setStatus("pending");
+                        signerCodeudor.setStatus_identity("active");
+                        signerCodeudor.setFlow_id(tabla.getDato3());
+                        signerCodeudor.setOrganization_id(tabla.getDato2());
+                        lista.add(signerCodeudor);
+                    }
 
-                SignerReqVo signer = new SignerReqVo();
-                signer.setEmail(correo);//persona.getEmail());
-                signer.setPhone(persona.getCelular());
-                signer.setFullname(persona.getNombre() + " " + persona.getAppaterno() + " " + persona.getAppaterno());
-                signer.setStatus("pending");
-                signer.setStatus_identity("active");
-                signer.setFlow_id(tabla.getDato3());
-                signer.setOrganization_id(tabla.getDato2());
+                    if(!ogsAval1.isEmpty()){
+                        ogsVo = util.ogs(ogsAval1);
+                        personaPK = new PersonaPK(ogsVo.getIdorigen(), ogsVo.getIdgrupo(), ogsVo.getIdsocio());
+                        persona = personaService.buscarPorId(personaPK);
+                        SignerReqVo signerAval1 = new SignerReqVo();
 
-                SignersVoReq signersVoReq = new SignersVoReq();
-                List<SignerReqVo> lista = new ArrayList<>();
-                lista.add(signer);
-                signersVoReq.setSigners(lista);
+                        signerAval1.setEmail(persona.getEmail());
+                        signerAval1.setPhone(persona.getCelular());
+                        signerAval1.setFullname(persona.getNombre() + " " + persona.getAppaterno() + " " + persona.getAppaterno());
+                        signerAval1.setStatus("pending");
+                        signerAval1.setStatus_identity("active");
+                        signerAval1.setFlow_id(tabla.getDato3());
+                        signerAval1.setOrganization_id(tabla.getDato2());
+                        lista.add(signerAval1);
+                    }
 
-                //Buscamos si existe un token en tablas
-                tablaPK = new TablaPK(idTabla, "token");
-                tabla = tablaService.buscarPorId(tablaPK);
+                    if(!ogsAval2.isEmpty()){
+                        ogsVo = util.ogs(ogsAval2);
+                        personaPK = new PersonaPK(ogsVo.getIdorigen(), ogsVo.getIdgrupo(), ogsVo.getIdsocio());
+                        persona = personaService.buscarPorId(personaPK);
+                        SignerReqVo signerAval2 = new SignerReqVo();
 
-                if (tabla != null) {
-                    token();
-                    identidadVoResponse = apisHttp.identidadCrear(signersVoReq);
-                    if (!identidadVoResponse.isSuccess() && identidadVoResponse.getMessage().contains("AUTHORIZATION_ERROR")) {
+                        signerAval2.setEmail(persona.getEmail());
+                        signerAval2.setPhone(persona.getCelular());
+                        signerAval2.setFullname(persona.getNombre() + " " + persona.getAppaterno() + " " + persona.getAppaterno());
+                        signerAval2.setStatus("pending");
+                        signerAval2.setStatus_identity("active");
+                        signerAval2.setFlow_id(tabla.getDato3());
+                        signerAval2.setOrganization_id(tabla.getDato2());
+                        lista.add(signerAval2);
+                    }
+
+                    if(!ogsAval3.isEmpty()){
+                        ogsVo = util.ogs(ogsAval3);
+                        personaPK = new PersonaPK(ogsVo.getIdorigen(), ogsVo.getIdgrupo(), ogsVo.getIdsocio());
+                        persona = personaService.buscarPorId(personaPK);
+                        SignerReqVo signerAval3 = new SignerReqVo();
+
+                        signerAval3.setEmail(persona.getEmail());
+                        signerAval3.setPhone(persona.getCelular());
+                        signerAval3.setFullname(persona.getNombre() + " " + persona.getAppaterno() + " " + persona.getAppaterno());
+                        signerAval3.setStatus("pending");
+                        signerAval3.setStatus_identity("active");
+                        signerAval3.setFlow_id(tabla.getDato3());
+                        signerAval3.setOrganization_id(tabla.getDato2());
+                        lista.add(signerAval3);
+                    }
+
+                    signersVoReq.setSigners(lista);
+                    log.info("::Lista de identidades a crear:"+lista);
+
+                    //Buscamos si existe un token en tablas
+                    tablaPK = new TablaPK(idTabla, "token");
+                    tabla = tablaService.buscarPorId(tablaPK);
+
+                    if (tabla != null) {
                         token();
                         identidadVoResponse = apisHttp.identidadCrear(signersVoReq);
+                        if (!identidadVoResponse.isSuccess() && identidadVoResponse.getMessage().contains("AUTHORIZATION_ERROR")) {
+                            token();
+                            identidadVoResponse = apisHttp.identidadCrear(signersVoReq);
+                        }
+                    } else {
+                        log.warn(":::::::::::::::::No existe parametrizacion token::::::::::::");
                     }
                 } else {
-                    log.warn(":::::::::::::::::No existe parametrizacion token::::::::::::");
+                    log.info("::::::::::::::Persona no existe con id:" + ogs);
+
                 }
             } else {
-                log.info("::::::::::::::Persona no existe con id:" + ogs);
-
+                log.info("::::::::::::::No se han llenado variables para validacion de identidad:::::::::::::::::::");
             }
+
         } catch (Exception e) {
             log.error("::::::::::::Error al crear validacion de identidad:::::::::::" + e.getMessage());
         }
@@ -149,7 +252,7 @@ public class DigitalizacionServiceGeneral {
 
                         String ogs = util.ogs(persona.getPk());
                         //Consumimos metodo de crear Identidad
-                        IdentidadVoResponse identidadVoResponse = identidadCrear(ogs);
+                        IdentidadVoResponse identidadVoResponse = identidadCrear(ogs,opa);
 
                         ObjectMapper mapper = new ObjectMapper();
                         JsonNode dataArray = mapper.valueToTree(identidadVoResponse.getData());
@@ -159,14 +262,14 @@ public class DigitalizacionServiceGeneral {
                             JsonNode firstElement = dataArray.get(0);
                             String id = firstElement.get("_id").asText();
                             digitalDoc.setIdidentidad(id);
-                            digitalDoc.setMensajeFinal("Identidad creada:"+new Date());
+                            digitalDoc.setMensajeFinal("Identidad creada:" + new Date());
                             digitalDocService.insertarDigitalDoc(digitalDoc);
                             log.info("::::::::::Se envio la identidad::::::::::::");
                             resp.setSuccess(true);
                             resp.setMessage("Identidad creada con exito:" + id);
                         } else {
                             log.error(":::::::::::::::::::::" + identidadVoResponse.getMessage() + ":::::::::::::::::::");
-                            digitalDoc.setMensajeFinal(identidadVoResponse.getMessage()+":"+new Date());
+                            digitalDoc.setMensajeFinal(identidadVoResponse.getMessage() + ":" + new Date());
                             digitalDocService.insertarDigitalDoc(digitalDoc);
                             resp.setSuccess(false);
                             resp.setMessage(identidadVoResponse.getMessage());
@@ -174,12 +277,12 @@ public class DigitalizacionServiceGeneral {
                     }
                 } else {
                     log.info("::::::::::::::Estatus folio debe ser capturado:::::::::::::");
-                    digitalDoc.setMensajeFinal("Estatus folio debe ser capturado:"+new Date());
+                    digitalDoc.setMensajeFinal("Estatus folio debe ser capturado:" + new Date());
                     digitalDocService.insertarDigitalDoc(digitalDoc);
                 }
             } else {
                 log.info(":::::::::::::::No existe folio capturado::::::::::::::::");
-                digitalDoc.setMensajeFinal("No existe folio capturado:"+new Date());
+                digitalDoc.setMensajeFinal("No existe folio capturado:" + new Date());
                 digitalDocService.insertarDigitalDoc(digitalDoc);
             }
 
@@ -187,7 +290,7 @@ public class DigitalizacionServiceGeneral {
         } catch (Exception e) {
             log.error("Error al crear Documento para opa:" + opa + "," + e.getMessage() + ":::::::::::::::");
             resp.setMessage("Error al crear Documento:" + e.getMessage());
-            digitalDoc.setMensajeFinal(e.getMessage()+":"+new Date());
+            digitalDoc.setMensajeFinal(e.getMessage() + ":" + new Date());
             digitalDocService.insertarDigitalDoc(digitalDoc);
         }
         return resp;
@@ -232,11 +335,11 @@ public class DigitalizacionServiceGeneral {
                         columnasMap.put("IVA_INTERESES", new ArrayList<>());
                         columnasMap.put("TOTAL_PAGAR", new ArrayList<>());
 
-                       
+
                         for (Amortizacion amortizacion : listaAmortizaciones) {
-                        	columnasMap.get("NUM_P").add(amortizacion.getIdamortizacion());
+                            columnasMap.get("NUM_P").add(amortizacion.getIdamortizacion());
                             columnasMap.get("FECHA_CORTE_PAGO").add(amortizacion.getVence().toString());
-                            columnasMap.get("ABONO_PRINCIPAL").add( amortizacion.getAbono());
+                            columnasMap.get("ABONO_PRINCIPAL").add(amortizacion.getAbono());
                             columnasMap.get("ANUALIDAD").add(amortizacion.getAnualidad());
                             columnasMap.get("SALDO_INSOLUTO").add(0.00);
                             columnasMap.get("INTERES_ORDINARIO").add(amortizacion.getIo());
@@ -269,7 +372,7 @@ public class DigitalizacionServiceGeneral {
                         confirmaIdentidadVo.setSucces(true);
                         confirmaIdentidadVo.setMessage(resp.getMessage());
                         digitalDoc.setOk_identidad(true);
-                        digitalDoc.setMensajeFinal("Documento creado exitosamente"+":"+new Date());
+                        digitalDoc.setMensajeFinal("Documento creado exitosamente" + ":" + new Date());
 
                         log.info("::::::::::::::Documento enviado,enviaremos a firmantes::::::::::::::::::::");
 
@@ -278,31 +381,31 @@ public class DigitalizacionServiceGeneral {
                         if (resSignersVo.isSuccess()) {
                             confirmaIdentidadVo.setSucces(true);
                             confirmaIdentidadVo.setMessage(resSignersVo.getMessage());
-                            digitalDoc.setMensajeFinal(resSignersVo.getMessage()+":"+new Date());
-                            log.info(":::::::::::::::::Mensaje envio a firmantes:"+resSignersVo.getMessage()+"::::::::::::::::::::::");
+                            digitalDoc.setMensajeFinal(resSignersVo.getMessage() + ":" + new Date());
+                            log.info(":::::::::::::::::Mensaje envio a firmantes:" + resSignersVo.getMessage() + "::::::::::::::::::::::");
                             digitalDoc.setEnviado_firmantes(true);
-                        }else{
+                        } else {
                             digitalDoc.setMensajeFinal(resSignersVo.getMessage());
                             digitalDoc.setEnviado_firmantes(false);
                         }
                     } else {
                         confirmaIdentidadVo.setMessage(resp.getMessage());
-                        digitalDoc.setMensajeFinal(resp.getMessage()+":"+new Date());
+                        digitalDoc.setMensajeFinal(resp.getMessage() + ":" + new Date());
                     }
                 }
-            }else {
-            	log.info("::::::::::::Es el documento no existe o ya se envio a firma anteriormente::::::::::::::");
+            } else {
+                log.info("::::::::::::Es el documento no existe o ya se envio a firma anteriormente::::::::::::::");
                 digitalDoc.setMensajeFinal("Documento no existe o ya se envio a firma anteriormente");
                 digitalDoc.setOk_identidad(false);
                 digitalDoc.setOk_docto_creado(false);
                 confirmaIdentidadVo.setMessage("Documento no existe o ya se envio a firma anteriormente");
-                
+
             }
         } catch (Exception e) {
             log.error("::::::::::::Error al confirmar identidad:::::::::::::" + e.getMessage());
             digitalDoc.setOk_identidad(false);
             digitalDoc.setOk_docto_creado(false);
-            digitalDoc.setMensajeFinal("Error al confirmar identidad:::::::::::::" + e.getMessage()+":"+new Date());
+            digitalDoc.setMensajeFinal("Error al confirmar identidad:::::::::::::" + e.getMessage() + ":" + new Date());
 
         }
         digitalDocService.insertarDigitalDoc(digitalDoc);
@@ -364,7 +467,7 @@ public class DigitalizacionServiceGeneral {
                     Signer signer = new Signer();
                     OgsVo ogsVo = new OgsVo();
 
-                    if(!persona.getEmail().isEmpty()){
+                    if (!persona.getEmail().isEmpty()) {
                         signer.setEmail(persona.getEmail().trim());
                         signer.setFullname(persona.getNombre() + " " + persona.getAppaterno() + " " + persona.getApmaterno());
                         signer.setRole("FIRMANTE");
@@ -385,7 +488,7 @@ public class DigitalizacionServiceGeneral {
                     }
 
                     if (!ogsAval1.isEmpty()) {
-                    	log.info(":::::::::::::::::::Aval 1 ogs:"+ogsAval1);
+                        log.info(":::::::::::::::::::Aval 1 ogs:" + ogsAval1);
                         ogsVo = util.ogs(ogsAval1);
                         personaPK = new PersonaPK(ogsVo.getIdorigen(), ogsVo.getIdgrupo(), ogsVo.getIdsocio());
                         persona = personaService.buscarPorId(personaPK);
@@ -423,10 +526,10 @@ public class DigitalizacionServiceGeneral {
 
                     signersReqVo.setSigners(signers);
 
-                    if(!signersReqVo.getSigners().isEmpty()){
+                    if (!signersReqVo.getSigners().isEmpty()) {
                         signersReqVo.setSigners(signers);
                         log.info("::::::::::::Vamos a enviar a firmantes:::::::::::::::");
-                        System.out.println(":::::::Tu peticion:::"+signersReqVo);
+                        System.out.println(":::::::Tu peticion:::" + signersReqVo);
                         signersReqVo.setSend_invite(true);
                         ResSignersVo signerResVo = apisHttp.firmantes(signersReqVo);
                         resSignersVo.setMessage(signerResVo.getMessage());
@@ -447,10 +550,10 @@ public class DigitalizacionServiceGeneral {
                 resSignersVo.setMessage("El documento no existe o ya se envio a firma anteriormente");
                 digitalDoc.setMensajeFinal("Documento no existe o ya se envio a firma anteriormente");
             }
-           digitalDocService.insertarDigitalDoc(digitalDoc);
+            digitalDocService.insertarDigitalDoc(digitalDoc);
         } catch (Exception e) {
             log.error(":::::::::::::Sucedio un error al enviar a firmar:::::::::" + e.getMessage());
-            resSignersVo.setMessage("Error al enviar a firmantes:"+e.getMessage());
+            resSignersVo.setMessage("Error al enviar a firmantes:" + e.getMessage());
 
         }
         return resSignersVo;
@@ -463,7 +566,7 @@ public class DigitalizacionServiceGeneral {
             JSONObject json = new JSONObject(cadena);
             JSONObject jsonObject = json.getJSONObject("document");
             String idDoctoFirmado = jsonObject.getString("id");
-            boolean completed  = jsonObject.getBoolean("completed");
+            boolean completed = jsonObject.getBoolean("completed");
 
             if (!idDoctoFirmado.isEmpty() && completed) {
                 DigitalDoc digitalDoc = digitalDocService.buscaPorIdDocto(idDoctoFirmado);

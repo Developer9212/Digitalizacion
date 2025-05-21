@@ -150,6 +150,7 @@ public class ApisHttp {
                     .readTimeout(220, java.util.concurrent.TimeUnit.SECONDS)    // Tiempo de espera para la lectura de datos
                     .build();
             String json = mapper.writeValueAsString(signersVoReq);
+            log.info(":::::::::::Json identidades crear:"+json);
             mediaType = MediaType.parse("application/application/json");
             body = RequestBody.create(mediaType, json);
             String url = basePathS + pathIdentidadS;
