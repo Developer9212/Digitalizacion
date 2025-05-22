@@ -9,7 +9,7 @@ import javax.persistence.*;
 import java.util.Date;
 
 @Entity
-@Table(name = "identidades_creadas")
+@Table(name = "identidad_creada")
 @AllArgsConstructor
 @NoArgsConstructor
 @Data
