@@ -1,4 +1,4 @@
-DROP TABLE digital_doc_legalario;
+DROP TABLE IF EXISTS digital_doc_legalario;
 CREATE TABLE digital_doc_legalario
 (
     idorigenp       integer,
@@ -23,6 +23,6 @@ CREATE TABLE identidades_creadas
     idauxiliar    integer,
     ididentidad   text,
     fecha_creada  timestamp with time zone,
-    confirmada    boolean,
+    confirmada    boolean
 
 );
