@@ -22,10 +22,7 @@ public class DigitalDocServiceImpl implements IDigitalDocService{
          digitalDocDao.save(digitalDoc);
     }
 
-    @Override
-    public DigitalDoc buscaPorIdIdentidad(String ididentidad) {
-        return digitalDocDao.findByIdidentidad(ididentidad);
-    }
+   
 
     @Override
     public DigitalDoc buscaPorIdDocto(String iddoc) {

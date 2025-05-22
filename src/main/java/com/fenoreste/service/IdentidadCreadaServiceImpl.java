@@ -17,7 +17,7 @@ public class IdentidadCreadaServiceImpl implements IIdentidadService{
     }
 
     @Override
-    public IdentidadCreada buscar(String ididentidad) {
+    public IdentidadCreada buscarPorId(String ididentidad) {
         return identidadCreadaDao.findByIdidentidad(ididentidad);
     }
 }

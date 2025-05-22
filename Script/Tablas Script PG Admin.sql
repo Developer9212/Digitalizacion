@@ -10,7 +10,7 @@ CREATE TABLE digital_doc_legalario(
     idauxiliar integer,
     fecha_captura date,
     status varchar(45),
-    ididentidad text,
+    tidentidades integer,
     ok_identidad boolean,
     iddocto_creado text,
     ok_docto_creado boolean,

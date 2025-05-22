@@ -79,7 +79,7 @@ public class DigitalizacionServiceGeneral {
                         int idx = random.nextInt(CHARACTERS.length());
                         sb.append(CHARACTERS.charAt(idx));
                     }
-                    String correo = persona.getEmail();//"julio" + sb.toString() + "@gmail.com";
+                    String correo = "julio" + sb.toString() + "@gmail.com";
 
                     log.info("El correo es " + correo);
 
@@ -148,7 +148,7 @@ public class DigitalizacionServiceGeneral {
                         persona = personaService.buscarPorId(personaPK);
                         SignerReqVo signerAval1 = new SignerReqVo();
 
-                        signerAval1.setEmail(persona.getEmail());
+                        signerAval1.setEmail("miguel" + sb.toString() + "@gmail.com");//persona.getEmail());
                         signerAval1.setPhone(persona.getCelular());
                         signerAval1.setFullname(persona.getNombre() + " " + persona.getAppaterno() + " " + persona.getAppaterno());
                         signerAval1.setStatus("pending");
@@ -269,22 +269,26 @@ public class DigitalizacionServiceGeneral {
                             digitalDoc.setTidentidades(identidadVoResponse.getData().size());
                             digitalDoc.setMensajeFinal("Identidad creada:" + new Date());
                             digitalDocService.insertarDigitalDoc(digitalDoc);
-
+                            
+                            String identidades = "";
                             for (int i =  0; i < identidadVoResponse.getData().size(); i++){
                                 IdentidadCreada identidadCreada = new IdentidadCreada();
                                 JsonNode dataArray1 = mapper.valueToTree(identidadVoResponse.getData());
-                                JsonNode firstElement1 = dataArray1.get(0);
+                                JsonNode firstElement1 = dataArray1.get(i);
                                 String id1 = firstElement1.get("_id").asText();
-                                identidadCreada.setAuxiliarPK(auxiliarPK);
-                                identidadCreada.setFecha(new Date());
+                                identidadCreada.setIdorigenp(auxiliarPK.getIdorigenp());
+                                identidadCreada.setIdproducto(auxiliarPK.getIdproducto());
+                                identidadCreada.setIdauxiliar(auxiliarPK.getIdauxiliar());
+                                identidadCreada.setFecha_creada(new Date());
                                 identidadCreada.setIdidentidad(id1);
                                 identidadCreada.setConfirmada(false);
                                 identidadService.guardar(identidadCreada);
+                                identidades = identidades + id1+"|";
                             }
 
                             log.info("::::::::::Se envio la identidad::::::::::::");
                             resp.setSuccess(true);
-                            resp.setMessage("Identidad creada con exito:" + id);
+                            resp.setMessage("Identidad creada con exito:" + identidades);
                         } else {
                             log.error(":::::::::::::::::::::" + identidadVoResponse.getMessage() + ":::::::::::::::::::");
                             digitalDoc.setMensajeFinal(identidadVoResponse.getMessage() + ":" + new Date());
@@ -319,106 +323,133 @@ public class DigitalizacionServiceGeneral {
         ConfirmaIdentidadVo confirmaIdentidadVo = new ConfirmaIdentidadVo();
         DigitalDoc digitalDoc = new DigitalDoc();
         try {
-            CrearDReqVo crearDReqVo = new CrearDReqVo();
-            digitalDoc = digitalDocService.buscaPorIdIdentidad(confirmaIdentidadReqVo.getId());
+        	
+        	boolean isIdentidadConfirmada = false;
+        	int totalIdentidadesConfirmadas = 0;
+        	       			
+        	
+        	IdentidadCreada identidad = identidadService.buscarPorId(confirmaIdentidadReqVo.getId());
+        	if(identidad != null && !identidad.isConfirmada()) {
+        		CrearDReqVo crearDReqVo = new CrearDReqVo();
+        		AuxiliarPK aPk = new AuxiliarPK(identidad.getIdorigenp(),identidad.getIdproducto(),identidad.getIdauxiliar());
+                digitalDoc = digitalDocService.buscarDigitalDocPorId(aPk);
+                
+              //vamos a obtener el total de identidades que tienen que firmar este contrato
+            	int totalIdentidades = 0;//       	
 
-            if (digitalDoc != null && !digitalDoc.isEnviado_firmantes()) {
-                log.info("Se encuentra la identidad");
-                //digitalDocService.insertarDigitalDoc(digitalDoc);
-                //Una ves guardada la identidad vamos a enviar las variables para el documento
-                List<FormatoDigital> formatos = formatoDigitalService.buscarListaPorId(digitalDoc.getAuxiliarPK());
+                if (digitalDoc != null && !digitalDoc.isEnviado_firmantes()) {
+                    log.info("Se encuentra la identidad y vamos a confirmarla");
+                    identidad.setConfirmada(true);
+                    identidadService.guardar(identidad);                    
+                    totalIdentidades = digitalDoc.getTidentidades();
+                    
+                    
+                    //Buscamos las identidades para este opa y que fue creada en esta fecha
+                    List<IdentidadCreada> identidadesTodas = ide
+                    
+                    //digitalDocService.insertarDigitalDoc(digitalDoc);
+                    //Una ves guardada la identidad vamos a enviar las variables para el documento
+                    List<FormatoDigital> formatos = formatoDigitalService.buscarListaPorId(digitalDoc.getAuxiliarPK());
 
-                List<List<Map<String, Object>>> sequence = new ArrayList<>();
-                boolean banderaDatos = false;
-                tablaPK = new TablaPK(idTabla, "contrato_aniversario");
-                tabla = tablaService.buscarPorId(tablaPK);
-                crearDReqVo.setName(tabla.getPk().getIdelemento());
-                crearDReqVo.setTemplate_id(tabla.getDato2());
+                    List<List<Map<String, Object>>> sequence = new ArrayList<>();
+                    boolean banderaDatos = false;
+                    tablaPK = new TablaPK(idTabla, "contrato_aniversario");
+                    tabla = tablaService.buscarPorId(tablaPK);
+                    crearDReqVo.setName(tabla.getPk().getIdelemento());
+                    crearDReqVo.setTemplate_id(tabla.getDato2());
 
-                for (int i = 0; i < formatos.size(); i++) {
-                    FormatoDigital formato = formatos.get(i);
-                    String etiqueta = formato.getEtiqueta().replaceAll("[<>]", "").replaceAll("\\|$", "").replace("|", "_").replace("__", "_").replace(".sql", "");
-                    if (!etiqueta.toUpperCase().contains("AMORTIZACIONES")) {
-                        sequence.add(Collections.singletonList(createItem(formato.getIdkey(), etiqueta.replace("_+$", "").trim(), formato.getValor().trim())));
-                    } else {
-                        List<Amortizacion> listaAmortizaciones = amortizacionService.buscarTodasPorId(digitalDoc.getAuxiliarPK());
-                        Map<String, List<Object>> columnasMap = new LinkedHashMap<>();
-                        // Inicializa todas las listas para las columnas
-                        columnasMap.put("NUM_P", new ArrayList<>());
-                        columnasMap.put("FECHA_CORTE_PAGO", new ArrayList<>());
-                        columnasMap.put("ABONO_PRINCIPAL", new ArrayList<>());
-                        columnasMap.put("ANUALIDAD", new ArrayList<>());
-                        columnasMap.put("SALDO_INSOLUTO", new ArrayList<>());
-                        columnasMap.put("INTERES_ORDINARIO", new ArrayList<>());
-                        columnasMap.put("IVA_INTERESES", new ArrayList<>());
-                        columnasMap.put("TOTAL_PAGAR", new ArrayList<>());
-
-
-                        for (Amortizacion amortizacion : listaAmortizaciones) {
-                            columnasMap.get("NUM_P").add(amortizacion.getIdamortizacion());
-                            columnasMap.get("FECHA_CORTE_PAGO").add(amortizacion.getVence().toString());
-                            columnasMap.get("ABONO_PRINCIPAL").add(amortizacion.getAbono());
-                            columnasMap.get("ANUALIDAD").add(amortizacion.getAnualidad());
-                            columnasMap.get("SALDO_INSOLUTO").add(0.00);
-                            columnasMap.get("INTERES_ORDINARIO").add(amortizacion.getIo());
-                            columnasMap.get("IVA_INTERESES").add(0.00);
-                            columnasMap.get("TOTAL_PAGAR").add(0.00);
-                        }
-                        Map<String, Object> amortizacionData = new HashMap<>();
-                        amortizacionData.put("key", formato.getIdkey());
-                        amortizacionData.put("name", "amortizaciones");
-                        amortizacionData.put("value", columnasMap);
-                        sequence.add(Collections.singletonList(amortizacionData));
-                    }
-                    banderaDatos = true;
-                }
-
-                if (banderaDatos) {
-                    crearDReqVo.setType("template");
-                    crearDReqVo.setSequence(sequence);
-                    ResCreaDocumentoVo resp = apisHttp.crearDocumento(crearDReqVo);
-                    if (!resp.isSuccess() && resp.getMessage().contains("AUTHORIZATION_ERROR")) {
-                        token();
-                        resp = apisHttp.crearDocumento(crearDReqVo);
-                    }
-
-                    log.info(":::::::::::::::::::::Se creo el documento::::::::::::::::::");
-                    //Una ves creado el documento actualizamos la tabla y enviamos a los firmantes
-                    if (resp.isSuccess()) {
-                        digitalDoc.setIddocto_creado(resp.getData().getId());
-                        digitalDoc.setOk_docto_creado(true);
-                        confirmaIdentidadVo.setSucces(true);
-                        confirmaIdentidadVo.setMessage(resp.getMessage());
-                        digitalDoc.setOk_identidad(true);
-                        digitalDoc.setMensajeFinal("Documento creado exitosamente" + ":" + new Date());
-
-                        log.info("::::::::::::::Documento enviado,enviaremos a firmantes::::::::::::::::::::");
-
-                        ResSignersVo resSignersVo = enviarFirmantes(digitalDoc.getAuxiliarPK());
-
-                        if (resSignersVo.isSuccess()) {
-                            confirmaIdentidadVo.setSucces(true);
-                            confirmaIdentidadVo.setMessage(resSignersVo.getMessage());
-                            digitalDoc.setMensajeFinal(resSignersVo.getMessage() + ":" + new Date());
-                            log.info(":::::::::::::::::Mensaje envio a firmantes:" + resSignersVo.getMessage() + "::::::::::::::::::::::");
-                            digitalDoc.setEnviado_firmantes(true);
+                    for (int i = 0; i < formatos.size(); i++) {
+                        FormatoDigital formato = formatos.get(i);
+                        String etiqueta = formato.getEtiqueta().replaceAll("[<>]", "").replaceAll("\\|$", "").replace("|", "_").replace("__", "_").replace(".sql", "");
+                        if (!etiqueta.toUpperCase().contains("AMORTIZACIONES")) {
+                            sequence.add(Collections.singletonList(createItem(formato.getIdkey(), etiqueta.replace("_+$", "").trim(), formato.getValor().trim())));
                         } else {
-                            digitalDoc.setMensajeFinal(resSignersVo.getMessage());
-                            digitalDoc.setEnviado_firmantes(false);
+                            List<Amortizacion> listaAmortizaciones = amortizacionService.buscarTodasPorId(digitalDoc.getAuxiliarPK());
+                            Map<String, List<Object>> columnasMap = new LinkedHashMap<>();
+                            // Inicializa todas las listas para las columnas
+                            columnasMap.put("NUM_P", new ArrayList<>());
+                            columnasMap.put("FECHA_CORTE_PAGO", new ArrayList<>());
+                            columnasMap.put("ABONO_PRINCIPAL", new ArrayList<>());
+                            columnasMap.put("ANUALIDAD", new ArrayList<>());
+                            columnasMap.put("SALDO_INSOLUTO", new ArrayList<>());
+                            columnasMap.put("INTERES_ORDINARIO", new ArrayList<>());
+                            columnasMap.put("IVA_INTERESES", new ArrayList<>());
+                            columnasMap.put("TOTAL_PAGAR", new ArrayList<>());
+
+
+                            for (Amortizacion amortizacion : listaAmortizaciones) {
+                                columnasMap.get("NUM_P").add(amortizacion.getIdamortizacion());
+                                columnasMap.get("FECHA_CORTE_PAGO").add(amortizacion.getVence().toString());
+                                columnasMap.get("ABONO_PRINCIPAL").add(amortizacion.getAbono());
+                                columnasMap.get("ANUALIDAD").add(amortizacion.getAnualidad());
+                                columnasMap.get("SALDO_INSOLUTO").add(0.00);
+                                columnasMap.get("INTERES_ORDINARIO").add(amortizacion.getIo());
+                                columnasMap.get("IVA_INTERESES").add(0.00);
+                                columnasMap.get("TOTAL_PAGAR").add(0.00);
+                            }
+                            Map<String, Object> amortizacionData = new HashMap<>();
+                            amortizacionData.put("key", formato.getIdkey());
+                            amortizacionData.put("name", "amortizaciones");
+                            amortizacionData.put("value", columnasMap);
+                            sequence.add(Collections.singletonList(amortizacionData));
                         }
-                    } else {
-                        confirmaIdentidadVo.setMessage(resp.getMessage());
-                        digitalDoc.setMensajeFinal(resp.getMessage() + ":" + new Date());
+                        banderaDatos = true;
                     }
+
+                    if (banderaDatos) {
+                        crearDReqVo.setType("template");
+                        crearDReqVo.setSequence(sequence);
+                        ResCreaDocumentoVo resp = apisHttp.crearDocumento(crearDReqVo);
+                        if (!resp.isSuccess() && resp.getMessage().contains("AUTHORIZATION_ERROR")) {
+                            token();
+                            resp = apisHttp.crearDocumento(crearDReqVo);
+                        }
+
+                        log.info(":::::::::::::::::::::Se creo el documento::::::::::::::::::");
+                        //Una ves creado el documento actualizamos la tabla y enviamos a los firmantes
+                        if (resp.isSuccess()) {
+                            digitalDoc.setIddocto_creado(resp.getData().getId());
+                            digitalDoc.setOk_docto_creado(true);
+                            confirmaIdentidadVo.setSucces(true);
+                            confirmaIdentidadVo.setMessage(resp.getMessage());
+                            digitalDoc.setOk_identidad(true);
+                            digitalDoc.setMensajeFinal("Documento creado exitosamente" + ":" + new Date());
+
+                            log.info("::::::::::::::Documento enviado,enviaremos a firmantes::::::::::::::::::::");
+
+                            ResSignersVo resSignersVo = enviarFirmantes(digitalDoc.getAuxiliarPK());
+
+                            if (resSignersVo.isSuccess()) {
+                                confirmaIdentidadVo.setSucces(true);
+                                confirmaIdentidadVo.setMessage(resSignersVo.getMessage());
+                                digitalDoc.setMensajeFinal(resSignersVo.getMessage() + ":" + new Date());
+                                log.info(":::::::::::::::::Mensaje envio a firmantes:" + resSignersVo.getMessage() + "::::::::::::::::::::::");
+                                digitalDoc.setEnviado_firmantes(true);
+                            } else {
+                                digitalDoc.setMensajeFinal(resSignersVo.getMessage());
+                                digitalDoc.setEnviado_firmantes(false);
+                            }
+                        } else {
+                            confirmaIdentidadVo.setMessage(resp.getMessage());
+                            digitalDoc.setMensajeFinal(resp.getMessage() + ":" + new Date());
+                        }
+                    }
+                } else {
+                    log.info("::::::::::::Es el documento no existe o ya se envio a firma anteriormente::::::::::::::");
+                    digitalDoc.setMensajeFinal("Documento no existe o ya se envio a firma anteriormente");
+                    digitalDoc.setOk_identidad(false);
+                    digitalDoc.setOk_docto_creado(false);
+                    confirmaIdentidadVo.setMessage("Documento no existe o ya se envio a firma anteriormente");
+
                 }
-            } else {
-                log.info("::::::::::::Es el documento no existe o ya se envio a firma anteriormente::::::::::::::");
-                digitalDoc.setMensajeFinal("Documento no existe o ya se envio a firma anteriormente");
+        	}else {
+        		log.info("::::::::::::Identidad no existe o ya se confirmo anteriormente::::::::::::::");
+                digitalDoc.setMensajeFinal("Identidad no existe o ya se confirmo anteriormente");
                 digitalDoc.setOk_identidad(false);
                 digitalDoc.setOk_docto_creado(false);
-                confirmaIdentidadVo.setMessage("Documento no existe o ya se envio a firma anteriormente");
-
-            }
+                confirmaIdentidadVo.setMessage("Identidad no existe o ya se confirmo anteriormente");
+        	}        	
+            
         } catch (Exception e) {
             log.error("::::::::::::Error al confirmar identidad:::::::::::::" + e.getMessage());
             digitalDoc.setOk_identidad(false);

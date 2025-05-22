@@ -15,10 +15,12 @@ import java.util.Date;
 @Data
 public class IdentidadCreada {
 
-    @EmbeddedId
-    private AuxiliarPK auxiliarPK;
+    @Id
     private String ididentidad;
+    private Integer idorigenp;
+    private Integer idproducto;
+    private Integer idauxiliar;    
     @Temporal(TemporalType.TIMESTAMP)
-    private Date fecha;
+    private Date fecha_creada;
     private boolean confirmada;
 }
