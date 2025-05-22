@@ -21,7 +21,7 @@ public class DigitalDoc implements Serializable {
     @Temporal(TemporalType.TIMESTAMP)
     private Date fecha_captura;
     private String status;
-    private String ididentidad;
+    private Integer tidentidades;
     private boolean ok_identidad=false;
     private String iddocto_creado;
     private boolean ok_docto_creado;

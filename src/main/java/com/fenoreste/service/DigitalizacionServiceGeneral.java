@@ -46,6 +46,9 @@ public class DigitalizacionServiceGeneral {
     private IAuxiliarService auxiliarService;
 
     @Autowired
+    private IIdentidadService identidadService;
+
+    @Autowired
     private ApisHttp apisHttp;
 
 
@@ -201,6 +204,8 @@ public class DigitalizacionServiceGeneral {
                             token();
                             identidadVoResponse = apisHttp.identidadCrear(signersVoReq);
                         }
+
+
                     } else {
                         log.warn(":::::::::::::::::No existe parametrizacion token::::::::::::");
                     }
@@ -240,8 +245,8 @@ public class DigitalizacionServiceGeneral {
                         digitalDoc.setAuxiliarPK(a.getPk());
                         digitalDoc.setFecha_captura(new Date());
                         digitalDoc.setStatus("Pendiente");
-                        digitalDoc.setOk_identidad(false);
                         digitalDoc.setFirmado(false);
+                        digitalDoc.setOk_identidad(false);
 
                         digitalDocService.insertarDigitalDoc(digitalDoc);
 
@@ -261,9 +266,22 @@ public class DigitalizacionServiceGeneral {
                             digitalDoc = digitalDocService.buscarDigitalDocPorId(a.getPk());
                             JsonNode firstElement = dataArray.get(0);
                             String id = firstElement.get("_id").asText();
-                            digitalDoc.setIdidentidad(id);
+                            digitalDoc.setTidentidades(identidadVoResponse.getData().size());
                             digitalDoc.setMensajeFinal("Identidad creada:" + new Date());
                             digitalDocService.insertarDigitalDoc(digitalDoc);
+
+                            for (int i =  0; i < identidadVoResponse.getData().size(); i++){
+                                IdentidadCreada identidadCreada = new IdentidadCreada();
+                                JsonNode dataArray1 = mapper.valueToTree(identidadVoResponse.getData());
+                                JsonNode firstElement1 = dataArray1.get(0);
+                                String id1 = firstElement1.get("_id").asText();
+                                identidadCreada.setAuxiliarPK(auxiliarPK);
+                                identidadCreada.setFecha(new Date());
+                                identidadCreada.setIdidentidad(id1);
+                                identidadCreada.setConfirmada(false);
+                                identidadService.guardar(identidadCreada);
+                            }
+
                             log.info("::::::::::Se envio la identidad::::::::::::");
                             resp.setSuccess(true);
                             resp.setMessage("Identidad creada con exito:" + id);
