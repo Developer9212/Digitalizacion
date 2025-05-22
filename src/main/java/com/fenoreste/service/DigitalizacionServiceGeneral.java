@@ -449,7 +449,7 @@ public class DigitalizacionServiceGeneral {
                                 }
                             }
                         }else{
-                            log.info("::::::::::::No se encuentran identidades para opa:" + aPk + ":::::::");
+                            log.info("::::::::::::Se confirmo la identidad pero no se completan todas::::::::");
                             digitalDoc.setMensajeFinal("Se confirmo la identidad pero no se completan todas::::");
                             digitalDoc.setOk_identidad(false);
                             digitalDoc.setOk_docto_creado(false);
