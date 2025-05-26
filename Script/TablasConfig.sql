@@ -16,7 +16,7 @@ CREATE TABLE digital_doc_legalario
 );
 
 
-DROP TABLE IF EXISTS identidades_creadas;
+DROP TABLE IF EXISTS identidad_creada;
 CREATE TABLE identidad_creada
 (
     idorigenp    integer,

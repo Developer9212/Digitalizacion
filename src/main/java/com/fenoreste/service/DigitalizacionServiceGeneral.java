@@ -79,7 +79,7 @@ public class DigitalizacionServiceGeneral {
                         int idx = random.nextInt(CHARACTERS.length());
                         sb.append(CHARACTERS.charAt(idx));
                     }
-                    String correo = "julio" + sb.toString() + "@gmail.com";
+                    String correo = persona.getEmail();// "julio" + sb.toString() + "@gmail.com";
 
                     log.info("El correo es " + correo);
 
@@ -148,7 +148,7 @@ public class DigitalizacionServiceGeneral {
                         persona = personaService.buscarPorId(personaPK);
                         SignerReqVo signerAval1 = new SignerReqVo();
 
-                        signerAval1.setEmail("miguel" + sb.toString() + "@gmail.com");//persona.getEmail());
+                        signerAval1.setEmail(persona.getEmail());
                         signerAval1.setPhone(persona.getCelular());
                         signerAval1.setFullname(persona.getNombre() + " " + persona.getAppaterno() + " " + persona.getAppaterno());
                         signerAval1.setStatus("pending");
