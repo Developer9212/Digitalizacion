@@ -233,8 +233,9 @@ public class DigitalizacionServiceGeneral {
 
             //Verificamos que el folio exista en auxiliares y que este en estatus capturado
             Auxiliar a = auxiliarService.buscarPorId(auxiliarPK);
+            log.info(":::::Estatus opa:"+a.getEstatus());
             if (a != null) {
-                if (a.getEstatus() == 0) {
+                if (a.getEstatus() == 2) {
                     List<List<Map<String, Object>>> sequence1 = new ArrayList<>();
                     //Si esta el auxiliar ahora buscamos que esten las variables listas para el contrato
                     List<FormatoDigital> formatos = formatoDigitalService.buscarListaPorId(auxiliarPK);
@@ -299,13 +300,11 @@ public class DigitalizacionServiceGeneral {
                     }
                 } else {
                     log.info("::::::::::::::Estatus folio debe ser capturado:::::::::::::");
-                    digitalDoc.setMensajeFinal("Estatus folio debe ser capturado:" + new Date());
-                    digitalDocService.insertarDigitalDoc(digitalDoc);
+                    resp.setMessage("Estatus folio debe ser capturado:");
                 }
             } else {
                 log.info(":::::::::::::::No existe folio capturado::::::::::::::::");
-                digitalDoc.setMensajeFinal("No existe folio capturado:" + new Date());
-                digitalDocService.insertarDigitalDoc(digitalDoc);
+                resp.setMessage("El folio no existe");
             }
 
 
@@ -313,7 +312,7 @@ public class DigitalizacionServiceGeneral {
             log.error("Error al crear Documento para opa:" + opa + "," + e.getMessage() + ":::::::::::::::");
             resp.setMessage("Error al crear Documento:" + e.getMessage());
             digitalDoc.setMensajeFinal(e.getMessage() + ":" + new Date());
-            digitalDocService.insertarDigitalDoc(digitalDoc);
+            
         }
         return resp;
     }
@@ -322,6 +321,7 @@ public class DigitalizacionServiceGeneral {
     public ConfirmaIdentidadVo confirmaIdentidadVo(ConfirmaIdentidadReqVo confirmaIdentidadReqVo) {
         ConfirmaIdentidadVo confirmaIdentidadVo = new ConfirmaIdentidadVo();
         DigitalDoc digitalDoc = new DigitalDoc();
+        AuxiliarPK aPk = new AuxiliarPK();
         try {
 
             boolean isIdentidadConfirmada = false;
@@ -329,15 +329,16 @@ public class DigitalizacionServiceGeneral {
 
 
             IdentidadCreada identidad = identidadService.buscarPorId(confirmaIdentidadReqVo.getId());
-            if (identidad != null && !identidad.isConfirmada()) {
+            if (identidad != null && !identidad.isConfirmada()) {            	 
                 CrearDReqVo crearDReqVo = new CrearDReqVo();
-                AuxiliarPK aPk = new AuxiliarPK(identidad.getIdorigenp(), identidad.getIdproducto(), identidad.getIdauxiliar());
+                aPk = new AuxiliarPK(identidad.getIdorigenp(), identidad.getIdproducto(), identidad.getIdauxiliar());
+                digitalDoc.setAuxiliarPK(aPk);
                 digitalDoc = digitalDocService.buscarDigitalDocPorId(aPk);
-
+                
                 //vamos a obtener el total de identidades que tienen que firmar este contrato
                 int totalIdentidades = 0;//
-
-                if (digitalDoc != null && !digitalDoc.isEnviado_firmantes()) {
+                 
+                if (digitalDoc != null && !digitalDoc.isEnviado_firmantes()) {                	
                     log.info("Se encuentra la identidad y vamos a confirmarla");
                     identidad.setConfirmada(true);
                     identidadService.guardar(identidad);
@@ -378,6 +379,14 @@ public class DigitalizacionServiceGeneral {
                                 if (!etiqueta.toUpperCase().contains("AMORTIZACIONES")) {
                                     sequence.add(Collections.singletonList(createItem(formato.getIdkey(), etiqueta.replace("_+$", "").trim(), formato.getValor().trim())));
                                 } else {
+                                	
+                                	log.info("_:::::::::::::::Amortizaciones:"+formato.getValor());
+                                	
+                                	String[] lineas = formato.getValor().split("\\n");
+
+                                	
+                                	
+                                	
                                     List<Amortizacion> listaAmortizaciones = amortizacionService.buscarTodasPorId(digitalDoc.getAuxiliarPK());
                                     Map<String, List<Object>> columnasMap = new LinkedHashMap<>();
                                     // Inicializa todas las listas para las columnas
@@ -389,18 +398,20 @@ public class DigitalizacionServiceGeneral {
                                     columnasMap.put("INTERES_ORDINARIO", new ArrayList<>());
                                     columnasMap.put("IVA_INTERESES", new ArrayList<>());
                                     columnasMap.put("TOTAL_PAGAR", new ArrayList<>());
-
-
-                                    for (Amortizacion amortizacion : listaAmortizaciones) {
-                                        columnasMap.get("NUM_P").add(amortizacion.getIdamortizacion());
-                                        columnasMap.get("FECHA_CORTE_PAGO").add(amortizacion.getVence().toString());
-                                        columnasMap.get("ABONO_PRINCIPAL").add(amortizacion.getAbono());
-                                        columnasMap.get("ANUALIDAD").add(amortizacion.getAnualidad());
-                                        columnasMap.get("SALDO_INSOLUTO").add(0.00);
-                                        columnasMap.get("INTERES_ORDINARIO").add(amortizacion.getIo());
-                                        columnasMap.get("IVA_INTERESES").add(0.00);
-                                        columnasMap.get("TOTAL_PAGAR").add(0.00);
-                                    }
+                                    
+                                    for (String linea : lineas) {
+                                	    // Separar por |
+                                	    String[] columnas = linea.split("\\|");                               	    
+                                	    
+                                	    columnasMap.get("NUM_P").add(columnas[0]);
+                                        columnasMap.get("FECHA_CORTE_PAGO").add(columnas[1]);
+                                        columnasMap.get("ABONO_PRINCIPAL").add(columnas[2]);
+                                        columnasMap.get("ANUALIDAD").add(columnas[3]);
+                                        columnasMap.get("SALDO_INSOLUTO").add(columnas[4]);
+                                        columnasMap.get("INTERES_ORDINARIO").add(columnas[5]);
+                                        columnasMap.get("IVA_INTERESES").add(columnas[6]);
+                                        columnasMap.get("TOTAL_PAGAR").add(columnas[7]);
+                                	}
                                     Map<String, Object> amortizacionData = new HashMap<>();
                                     amortizacionData.put("key", formato.getIdkey());
                                     amortizacionData.put("name", "amortizaciones");
@@ -455,36 +466,31 @@ public class DigitalizacionServiceGeneral {
                             digitalDoc.setOk_docto_creado(false);
                             confirmaIdentidadVo.setMessage("Identidad confirmada:"+confirmaIdentidadReqVo.getId());
                         }
+                        
+                        digitalDoc.setAuxiliarPK(aPk);
+                        digitalDocService.insertarDigitalDoc(digitalDoc);
                     } else {
                         log.info("::::::::::::No se encuentran identidades para opa:" + aPk + ":::::::");
-                        digitalDoc.setMensajeFinal("No se encuentran identidades para opa"+aPk);
-                        digitalDoc.setOk_identidad(false);
-                        digitalDoc.setOk_docto_creado(false);
                         confirmaIdentidadVo.setMessage("No se encuentran identidades relacionadas al folio");
                     }
+                    
+                   
                 } else {
-                    log.info("::::::::::::Es el documento no existe o ya se envio a firma anteriormente::::::::::::::");
-                    digitalDoc.setMensajeFinal("Documento no existe o ya se envio a firma anteriormente");
-                    digitalDoc.setOk_identidad(false);
-                    digitalDoc.setOk_docto_creado(false);
+                    log.info("::::::::::::Es el documento no existe o ya se envio a firma anteriormente::::::::::::::");                   
                     confirmaIdentidadVo.setMessage("Documento no existe o ya se envio a firma anteriormente");
                 }
             } else {
                 log.info("::::::::::::Identidad no existe o ya se confirmo anteriormente::::::::::::::");
-                digitalDoc.setMensajeFinal("Identidad no existe o ya se confirmo anteriormente");
-                digitalDoc.setOk_identidad(false);
-                digitalDoc.setOk_docto_creado(false);
                 confirmaIdentidadVo.setMessage("Identidad no existe o ya se confirmo anteriormente");
             }
-
+            
         } catch (Exception e) {
-            log.error("::::::::::::Error al confirmar identidad:::::::::::::" + e.getMessage());
-            digitalDoc.setOk_identidad(false);
-            digitalDoc.setOk_docto_creado(false);
-            digitalDoc.setMensajeFinal("Error al confirmar identidad:::::::::::::" + e.getMessage() + ":" + new Date());
+            log.error("::::::::::::Error al confirmar identidad:::::::::::::" + e.getMessage()+",identidad:"+confirmaIdentidadReqVo.getId());
+            confirmaIdentidadVo.setMessage("Error al confirmar identidad:::::::::::::" + e.getMessage()+",identidad:"+confirmaIdentidadReqVo.getId());
 
         }
-        digitalDocService.insertarDigitalDoc(digitalDoc);
+        
+        
         return confirmaIdentidadVo;
     }
 
