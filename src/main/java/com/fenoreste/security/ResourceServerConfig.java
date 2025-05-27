@@ -22,7 +22,7 @@ public class ResourceServerConfig extends ResourceServerConfigurerAdapter {
 	public void configure(HttpSecurity http) throws Exception{
 		http
 		.anonymous().disable()
-		.authorizeRequests().antMatchers("/dddapdddi/webhook/**")
+		.authorizeRequests().antMatchers("/api/webhook/**")
 		.authenticated()
 		.and()
 		.exceptionHandling()
