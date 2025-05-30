@@ -177,6 +177,7 @@ public class ApisHttp {
     }
 
     public ResCreaDocumentoVo crearDocumento(CrearDReqVo crearDocumento) {
+        log.info(":::::Creando el documento::::::::::::");
         String resultado = "";
         ResCreaDocumentoVo creaDocumentoVo = new ResCreaDocumentoVo();
         try {
@@ -202,7 +203,7 @@ public class ApisHttp {
 
             response = client.newCall(request).execute();
             resultado = response.body().string();
-            log.info(":::::::::::Resultado HTTP al crear documento:::::::::::::::::" + resultado + "," + crearDocumento);
+            log.info(":::::::::::Resultado HTTP al crear documento:::::::::::::::::" + resultado);
             Gson gson = new Gson();
             JsonObject res = gson.fromJson(resultado, JsonObject.class);
 

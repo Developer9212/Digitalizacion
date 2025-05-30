@@ -379,6 +379,7 @@ public class DigitalizacionServiceGeneral {
                                 if (!etiqueta.toUpperCase().contains("AMORTIZACIONES")) {
                                     sequence.add(Collections.singletonList(createItem(formato.getIdkey(), etiqueta.replace("_+$", "").trim(), formato.getValor().trim())));
                                 } else {
+                                    log.info("La etiqueta es:"+etiqueta+","+formato.getValor());
                                     String[] lineas = formato.getValor().split("\\n");
                                     List<Amortizacion> listaAmortizaciones = amortizacionService.buscarTodasPorId(digitalDoc.getAuxiliarPK());
                                     Map<String, List<Object>> columnasMap = new LinkedHashMap<>();
@@ -395,7 +396,6 @@ public class DigitalizacionServiceGeneral {
                                     for (String linea : lineas) {
                                         // Separar por |
                                         String[] columnas = linea.split("\\|");
-
                                         columnasMap.get("NUM_P").add(columnas[0]);
                                         columnasMap.get("FECHA_CORTE_PAGO").add(columnas[1]);
                                         columnasMap.get("ABONO_PRINCIPAL").add(columnas[2]);
@@ -404,7 +404,11 @@ public class DigitalizacionServiceGeneral {
                                         columnasMap.get("INTERES_ORDINARIO").add(columnas[5]);
                                         columnasMap.get("IVA_INTERESES").add(columnas[6]);
                                         columnasMap.get("TOTAL_PAGAR").add(columnas[7]);
+                                        log.info("Valor de anualidad:"+ columnas[3]+",saldo insoluto:"+columnas[4]+",interes ordinario:"+columnas[5],
+                                                "Iva Intereses:"+columnas[6]+",total a pagar:"+columnas[7]);
                                     }
+
+
                                     Map<String, Object> amortizacionData = new HashMap<>();
                                     amortizacionData.put("key", formato.getIdkey());
                                     amortizacionData.put("name", "amortizaciones");
@@ -415,6 +419,7 @@ public class DigitalizacionServiceGeneral {
                             }
 
                             if (banderaDatos) {
+                                log.info("::::::::Vamos a crear el documento:::::::::::::");
                                 crearDReqVo.setType("template");
                                 crearDReqVo.setSequence(sequence);
                                 ResCreaDocumentoVo resp = apisHttp.crearDocumento(crearDReqVo);
