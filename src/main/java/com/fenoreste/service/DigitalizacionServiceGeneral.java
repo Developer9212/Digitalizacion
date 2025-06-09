@@ -364,22 +364,28 @@ public class DigitalizacionServiceGeneral {
                         if (isIdentidadConfirmada) {
                             //digitalDocService.insertarDigitalDoc(digitalDoc);
                             //Una ves guardada la identidad vamos a enviar las variables para el documento
+                            log.info(":::::::::::::Vamos a buscar el registro opa:::::"+digitalDoc.getAuxiliarPK());
                             List<FormatoDigital> formatos = formatoDigitalService.buscarListaPorId(digitalDoc.getAuxiliarPK());
 
+                            log.info(":::::::::::::::Se encontro el formato:::::::::"+formatos);
                             List<List<Map<String, Object>>> sequence = new ArrayList<>();
                             boolean banderaDatos = false;
-                            tablaPK = new TablaPK(idTabla, "contrato_aniversario");
-                            tabla = tablaService.buscarPorId(tablaPK);
+
+                            log.info("::::::::Seteando la configuracion template::::::::::::"+ aPk.getIdproducto());
+                            tabla = tablaService.buscarPorIdProducto(aPk.getIdproducto());
                             crearDReqVo.setName(tabla.getPk().getIdelemento());
+                            log.info(":::::::::::El nombre ya esta seteado:::::::::::");
                             crearDReqVo.setTemplate_id(tabla.getDato2());
 
+                            log.info("::::::::::::::::::Vamos formar json variables:::::::::");
                             for (int i = 0; i < formatos.size(); i++) {
                                 FormatoDigital formato = formatos.get(i);
                                 String etiqueta = formato.getEtiqueta().replaceAll("[<>]", "").replaceAll("\\|$", "").replace("|", "_").replace("__", "_").replace(".sql", "");
+                                //log.info("Etiqueta::::::::::::"+etiqueta+",valor:"+formato.getValor());
                                 if (!etiqueta.toUpperCase().contains("AMORTIZACIONES")) {
                                     sequence.add(Collections.singletonList(createItem(formato.getIdkey(), etiqueta.replace("_+$", "").trim(), formato.getValor().trim())));
                                 } else {
-                                    log.info("La etiqueta es:"+etiqueta+","+formato.getValor());
+                                    //log.info("La etiqueta es:"+etiqueta+","+formato.getValor());
                                     String[] lineas = formato.getValor().split("\\n");
                                     List<Amortizacion> listaAmortizaciones = amortizacionService.buscarTodasPorId(digitalDoc.getAuxiliarPK());
                                     Map<String, List<Object>> columnasMap = new LinkedHashMap<>();

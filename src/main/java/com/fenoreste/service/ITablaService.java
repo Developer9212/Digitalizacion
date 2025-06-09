@@ -8,4 +8,6 @@ public interface ITablaService {
 	public Tabla buscarPorId(TablaPK pk);
 
 	public void insertar(Tabla tabla);
+
+	public Tabla buscarPorIdProducto(Integer idProducto);
 }

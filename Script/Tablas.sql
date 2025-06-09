@@ -9,8 +9,10 @@ INSERT INTO tablas(idtabla,idelemento,dato2,dato3) VALUES('digitalizacion','sign
 DELETE FROM tablas WHERE idtabla='digitalizacion' AND idelemento ='token';
 INSERT INTO tablas(idtabla,idelemento,dato2,dato3)VALUES('digitalizacion','token','fasasfasfsafasfsfasf','01/02/1970');
 
-DELETE FROM TABLAS WHERE idtabla='digitalizacion' AND idelemento ='contrato_aniversario';
-INSERT INTO TABLAS(idtabla,idelemento,dato2)VALUES('digitalizacion','contrato_aniversario','67eadea8c046bd05d01058b2');
 
 DELETE FROM TABLAS WHERE idtabla='digitalizacion' AND idelemento='user-ws';
 INSERT INTO TABLAS(idtabla,idelemento,nombre,dato1,dato2) VALUES('digitalizacion','user-ws','User for api autenticate','test','test');
+
+
+DELETE FROM TABLAS WHERE idtabla='digitalizacion' AND idelemento ='contrato_aniversario';
+INSERT INTO TABLAS(idtabla,idelemento,dato1,dato2)VALUES('digitalizacion','contrato_aniversario','32644','67eadea8c046bd05d01058b2');

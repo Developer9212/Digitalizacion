@@ -23,4 +23,9 @@ public class TablaServiceImpl implements ITablaService{
 		tablaDao.save(tabla);
 	}
 
+	@Override
+	public Tabla buscarPorIdProducto(Integer idProducto) {
+		return tablaDao.TablaPorIdProducto(String.valueOf(idProducto));
+	}
+
 }
