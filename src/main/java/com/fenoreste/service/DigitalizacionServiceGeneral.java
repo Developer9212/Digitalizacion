@@ -49,6 +49,9 @@ public class DigitalizacionServiceGeneral {
     private IIdentidadService identidadService;
 
     @Autowired
+    private IFolioTarjetaService folioTarjetaService;
+
+    @Autowired
     private ApisHttp apisHttp;
 
 
@@ -383,8 +386,21 @@ public class DigitalizacionServiceGeneral {
                                 String etiqueta = formato.getEtiqueta().replaceAll("[<>]", "").replaceAll("\\|$", "").replace("|", "_").replace("__", "_").replace(".sql", "");
                                 //log.info("Etiqueta::::::::::::"+etiqueta+",valor:"+formato.getValor());
                                 if (!etiqueta.toUpperCase().contains("AMORTIZACIONES")) {
-                                    sequence.add(Collections.singletonList(createItem(formato.getIdkey(), etiqueta.replace("_+$", "").trim(), formato.getValor().trim())));
-                                } else {
+                                    if(etiqueta.toUpperCase().contains("NUM_CUENTA_TDD")) {
+                                        log.info(":::::::::::::::Entro a formar opa para TDD::::::::::::");
+                                        Auxiliar auxTDD = auxiliarService.buscarPorId(digitalDoc.getAuxiliarPK());
+                                        log.info("Valor aux TDD:" + auxTDD);
+                                        PersonaPK personaPK = new PersonaPK(auxTDD.getIdorigen(), auxTDD.getIdgrupo(), auxTDD.getIdsocio());
+                                        auxTDD = auxiliarService.buscarPorOgsyProducto(personaPK, 133);
+                                        log.info("::::::::::::Tdd por idproducto::::" + auxTDD);
+                                        String opaTDD = String.format("%06d", auxTDD.getPk().getIdorigenp()) + String.format("%05d", auxTDD.getPk().getIdproducto()) + String.format("%08d", auxTDD.getPk().getIdauxiliar());
+                                        log.info("::::::::::::Opa formado:::::::::::" + opaTDD);
+                                        sequence.add(Collections.singletonList(createItem(formato.getIdkey(), etiqueta.replace("_+$", "").trim(), opaTDD.trim())));
+                                        log.info("::::::::::::Se añadio la etiqueta");
+                                    }else {
+                                        sequence.add(Collections.singletonList(createItem(formato.getIdkey(), etiqueta.replace("_+$", "").trim(), formato.getValor().trim())));
+                                    }
+                                }else {
                                     //log.info("La etiqueta es:"+etiqueta+","+formato.getValor());
                                     String[] lineas = formato.getValor().split("\\n");
                                     List<Amortizacion> listaAmortizaciones = amortizacionService.buscarTodasPorId(digitalDoc.getAuxiliarPK());

@@ -35,7 +35,7 @@ public class ApisHttp {
     private String pathLoginS = "auth/login";
     private String pathTokenS = "auth/token";
     private String pathIdentidadS = "v2/identities";
-    private String pathCrearDocumentoS = "v2/documents";
+    private String pathCrearDocumentoS = "v2/documents/new";
     private String pathEnviarFirmantes = "v2/signers";
 
     OkHttpClient client = null;
