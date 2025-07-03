@@ -238,7 +238,7 @@ public class DigitalizacionServiceGeneral {
             Auxiliar a = auxiliarService.buscarPorId(auxiliarPK);
             log.info(":::::Estatus opa:" + a.getEstatus());
             if (a != null) {
-                if (a.getEstatus() == 0) {
+                if (a.getEstatus() == 1) {
                     List<List<Map<String, Object>>> sequence1 = new ArrayList<>();
                     //Si esta el auxiliar ahora buscamos que esten las variables listas para el contrato
                     List<FormatoDigital> formatos = formatoDigitalService.buscarListaPorId(auxiliarPK);
@@ -370,33 +370,30 @@ public class DigitalizacionServiceGeneral {
                             log.info(":::::::::::::Vamos a buscar el registro opa:::::"+digitalDoc.getAuxiliarPK());
                             List<FormatoDigital> formatos = formatoDigitalService.buscarListaPorId(digitalDoc.getAuxiliarPK());
 
-                            log.info(":::::::::::::::Se encontro el formato:::::::::"+formatos);
+
                             List<List<Map<String, Object>>> sequence = new ArrayList<>();
                             boolean banderaDatos = false;
 
-                            log.info("::::::::Seteando la configuracion template::::::::::::"+ aPk.getIdproducto());
+
                             tabla = tablaService.buscarPorIdProducto(aPk.getIdproducto());
-                            crearDReqVo.setName(tabla.getPk().getIdelemento());
-                            log.info(":::::::::::El nombre ya esta seteado:::::::::::");
+                            Auxiliar  a = auxiliarService.buscarPorId(digitalDoc.getAuxiliarPK());
+                            PersonaPK personaPK = new PersonaPK(a.getIdorigen(),a.getIdgrupo(),a.getIdorigen());
+                            Persona p = personaService.buscarPorId(personaPK);
+
+                            crearDReqVo.setName(p.getNombre() +" "+ p.getAppaterno() + " "+p.getApmaterno() +"-"+ String.format("%06d",a.getPk().getIdorigenp())+String.format("%05d",a.getPk().getIdproducto())+String.format("%08d",a.getPk().getIdauxiliar()));
                             crearDReqVo.setTemplate_id(tabla.getDato2());
 
-                            log.info("::::::::::::::::::Vamos formar json variables:::::::::");
                             for (int i = 0; i < formatos.size(); i++) {
                                 FormatoDigital formato = formatos.get(i);
                                 String etiqueta = formato.getEtiqueta().replaceAll("[<>]", "").replaceAll("\\|$", "").replace("|", "_").replace("__", "_").replace(".sql", "");
                                 //log.info("Etiqueta::::::::::::"+etiqueta+",valor:"+formato.getValor());
                                 if (!etiqueta.toUpperCase().contains("AMORTIZACIONES")) {
                                     if(etiqueta.toUpperCase().contains("NUM_CUENTA_TDD")) {
-                                        log.info(":::::::::::::::Entro a formar opa para TDD::::::::::::");
                                         Auxiliar auxTDD = auxiliarService.buscarPorId(digitalDoc.getAuxiliarPK());
-                                        log.info("Valor aux TDD:" + auxTDD);
-                                        PersonaPK personaPK = new PersonaPK(auxTDD.getIdorigen(), auxTDD.getIdgrupo(), auxTDD.getIdsocio());
+                                        personaPK = new PersonaPK(auxTDD.getIdorigen(), auxTDD.getIdgrupo(), auxTDD.getIdsocio());
                                         auxTDD = auxiliarService.buscarPorOgsyProducto(personaPK, 133);
-                                        log.info("::::::::::::Tdd por idproducto::::" + auxTDD);
                                         String opaTDD = String.format("%06d", auxTDD.getPk().getIdorigenp()) + String.format("%05d", auxTDD.getPk().getIdproducto()) + String.format("%08d", auxTDD.getPk().getIdauxiliar());
-                                        log.info("::::::::::::Opa formado:::::::::::" + opaTDD);
                                         sequence.add(Collections.singletonList(createItem(formato.getIdkey(), etiqueta.replace("_+$", "").trim(), opaTDD.trim())));
-                                        log.info("::::::::::::Se añadio la etiqueta");
                                     }else {
                                         sequence.add(Collections.singletonList(createItem(formato.getIdkey(), etiqueta.replace("_+$", "").trim(), formato.getValor().trim())));
                                     }
