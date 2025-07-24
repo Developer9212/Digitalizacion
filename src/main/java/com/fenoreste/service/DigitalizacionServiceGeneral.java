@@ -367,7 +367,7 @@ public class DigitalizacionServiceGeneral {
                         if (isIdentidadConfirmada) {
                             //digitalDocService.insertarDigitalDoc(digitalDoc);
                             //Una ves guardada la identidad vamos a enviar las variables para el documento
-                            log.info(":::::::::::::Vamos a buscar el registro opa:::::"+digitalDoc.getAuxiliarPK());
+                            log.info(":::::::::::::Vamos a buscar el registro opa:::::" + digitalDoc.getAuxiliarPK());
                             List<FormatoDigital> formatos = formatoDigitalService.buscarListaPorId(digitalDoc.getAuxiliarPK());
 
 
@@ -376,11 +376,11 @@ public class DigitalizacionServiceGeneral {
 
 
                             tabla = tablaService.buscarPorIdProducto(aPk.getIdproducto());
-                            Auxiliar  a = auxiliarService.buscarPorId(digitalDoc.getAuxiliarPK());
-                            PersonaPK personaPK = new PersonaPK(a.getIdorigen(),a.getIdgrupo(),a.getIdorigen());
+                            Auxiliar a = auxiliarService.buscarPorId(digitalDoc.getAuxiliarPK());
+                            PersonaPK personaPK = new PersonaPK(a.getIdorigen(), a.getIdgrupo(), a.getIdsocio());
                             Persona p = personaService.buscarPorId(personaPK);
 
-                            crearDReqVo.setName(p.getNombre() +" "+ p.getAppaterno() + " "+p.getApmaterno() +"-"+ String.format("%06d",a.getPk().getIdorigenp())+String.format("%05d",a.getPk().getIdproducto())+String.format("%08d",a.getPk().getIdauxiliar()));
+                            crearDReqVo.setName(p.getNombre() + " " + p.getAppaterno() + " " + p.getApmaterno() + "-" + String.format("%06d", a.getPk().getIdorigenp()) + String.format("%05d", a.getPk().getIdproducto()) + String.format("%08d", a.getPk().getIdauxiliar()));
                             crearDReqVo.setTemplate_id(tabla.getDato2());
 
                             for (int i = 0; i < formatos.size(); i++) {
@@ -388,16 +388,23 @@ public class DigitalizacionServiceGeneral {
                                 String etiqueta = formato.getEtiqueta().replaceAll("[<>]", "").replaceAll("\\|$", "").replace("|", "_").replace("__", "_").replace(".sql", "");
                                 //log.info("Etiqueta::::::::::::"+etiqueta+",valor:"+formato.getValor());
                                 if (!etiqueta.toUpperCase().contains("AMORTIZACIONES")) {
-                                    if(etiqueta.toUpperCase().contains("NUM_CUENTA_TDD")) {
+                                    if (etiqueta.toUpperCase().contains("NUM_CUENTA_TDD")) {
                                         Auxiliar auxTDD = auxiliarService.buscarPorId(digitalDoc.getAuxiliarPK());
                                         personaPK = new PersonaPK(auxTDD.getIdorigen(), auxTDD.getIdgrupo(), auxTDD.getIdsocio());
                                         auxTDD = auxiliarService.buscarPorOgsyProducto(personaPK, 133);
-                                        String opaTDD = String.format("%06d", auxTDD.getPk().getIdorigenp()) + String.format("%05d", auxTDD.getPk().getIdproducto()) + String.format("%08d", auxTDD.getPk().getIdauxiliar());
+                                        String opaTDD = "";
+                                        if (auxTDD != null) {
+                                            opaTDD = String.format("%06d", auxTDD.getPk().getIdorigenp()) + String.format("%05d", auxTDD.getPk().getIdproducto()) + String.format("%08d", auxTDD.getPk().getIdauxiliar());
+                                        } else {
+                                            auxTDD = auxiliarService.buscarPorOgsyProducto(personaPK, 110);
+                                            opaTDD = String.format("%06d", auxTDD.getPk().getIdorigenp()) + String.format("%05d", auxTDD.getPk().getIdproducto()) + String.format("%08d", auxTDD.getPk().getIdauxiliar());
+                                        }
+
                                         sequence.add(Collections.singletonList(createItem(formato.getIdkey(), etiqueta.replace("_+$", "").trim(), opaTDD.trim())));
-                                    }else {
+                                    } else {
                                         sequence.add(Collections.singletonList(createItem(formato.getIdkey(), etiqueta.replace("_+$", "").trim(), formato.getValor().trim())));
                                     }
-                                }else {
+                                } else {
                                     //log.info("La etiqueta es:"+etiqueta+","+formato.getValor());
                                     String[] lineas = formato.getValor().split("\\n");
                                     List<Amortizacion> listaAmortizaciones = amortizacionService.buscarTodasPorId(digitalDoc.getAuxiliarPK());
@@ -423,8 +430,8 @@ public class DigitalizacionServiceGeneral {
                                         columnasMap.get("INTERES_ORDINARIO").add(columnas[5]);
                                         columnasMap.get("IVA_INTERESES").add(columnas[6]);
                                         columnasMap.get("TOTAL_PAGAR").add(columnas[7]);
-                                        log.info("Valor de anualidad:"+ columnas[3]+",saldo insoluto:"+columnas[4]+",interes ordinario:"+columnas[5],
-                                                "Iva Intereses:"+columnas[6]+",total a pagar:"+columnas[7]);
+                                        log.info("Valor de anualidad:" + columnas[3] + ",saldo insoluto:" + columnas[4] + ",interes ordinario:" + columnas[5],
+                                                "Iva Intereses:" + columnas[6] + ",total a pagar:" + columnas[7]);
                                     }
 
 
