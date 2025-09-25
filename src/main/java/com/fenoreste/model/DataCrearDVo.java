@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Map;
 
 @Data
+
 public class DataCrearDVo implements Serializable {
     private String id;
     private String organization_id;

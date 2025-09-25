@@ -26,12 +26,12 @@ import java.time.format.DateTimeFormatter;
 @Service
 public class ApisHttp {
 
-    private String basePath = "https://api.legalario.com/";
-    private String pathLogin = "auth/login";
-    private String pathToken = "auth/token";
+    /*Produccion*/
+    private String basePathProduccion = "https://api.legalario.com/";
+
 
     //Sandbox Testing
-    private String basePathS = "https://sandbox-api.legalario.com/";
+    private String basePathSandbox = "https://sandbox-api.legalario.com/";
     private String pathLoginS = "auth/login";
     private String pathTokenS = "auth/token";
     private String pathIdentidadS = "v2/identities";
@@ -60,10 +60,14 @@ public class ApisHttp {
 
     public LoginVoResponse login() {
         String resultado = "";
+        log.info("::::::::::::::::Accediendo al login::::::::::::::::::::");
         LoginVoResponse loginVoResponse = new LoginVoResponse();
         try {
+
             tablaPK = new TablaPK("digitalizacion", "login_credentials");
             tabla = tablaService.buscarPorId(tablaPK);
+
+            log.info(":::::::::::::::::::::::Datos login:::::::::::::"+tabla.getDato1()+","+tabla.getDato2());
             sslUtil.disableSSLCertificateChecking();
 
             client = new OkHttpClient.Builder()
@@ -71,15 +75,25 @@ public class ApisHttp {
                     .readTimeout(20, java.util.concurrent.TimeUnit.SECONDS)    // Tiempo de espera para la lectura de datos
                     .build();
 
-            mediaType = MediaType.parse("application/x-www-form-urlencoded");
-            body = RequestBody.create(mediaType, "email=ctello@csn.coop&password=HcJV6W85L8d9");
 
-            String url = basePathS + pathLoginS;
+            log.info("::::::::::::::::::::::Pasandoooooooooooooooooooooo a consumir login:::::::::::::::");
+            mediaType = MediaType.parse("application/x-www-form-urlencoded");
+
+            //body = RequestBody.create(mediaType, "email=ctello@csn.coop"+tabla.getDato2()+"&password=cjAs6L09Jqlh";//+tabla.getDato1());
+
+            body = RequestBody.create(mediaType, "email=ctello@csn.coop&password=cjAs6L09Jqlh");//+tabla.getDato1());
+            log.info(":::::::::::::::::::Body:"+body);
+
+            log.info(":::::::::::::::::::::::Datos login:::::::::::::"+tabla.getDato1()+","+tabla.getDato2());
+
+            String url = basePathProduccion + pathLoginS;
             request = new Request.Builder()
                     .url(url)
                     .method("POST", body).addHeader("Content-Type", "application/x-www-form-urlencoded").build();
             response = client.newCall(request).execute();
             resultado = response.body().string();
+
+            log.info(":::::::::::::::::Resultado login:::::::::::::::::::::"+resultado);
 
             JsonObject jsonObject = JsonParser.parseString(resultado).getAsJsonObject();
             JsonObject data = jsonObject.getAsJsonObject("data");
@@ -107,13 +121,15 @@ public class ApisHttp {
             body = RequestBody.create(mediaType, "client_id=" + clientId +
                     "&client_secret=" + clientSecret + "&grant_type=client_credentials&scope=customers");
 
-            String url = basePathS + pathTokenS;
+            String url = basePathProduccion + pathTokenS;
             request = new Request.Builder()
                     .url(url)
                     .method("POST", body).addHeader("Content-Type", "application/x-www-form-urlencoded").build();
             response = client.newCall(request).execute();
             resultado = response.body().string();
             log.info("Resultado token: " + resultado);
+
+
             tabla = new Tabla();
             tablaPK = new TablaPK("digitalizacion", "token");
             JsonObject jsonObject = JsonParser.parseString(resultado).getAsJsonObject();
@@ -153,7 +169,7 @@ public class ApisHttp {
             log.info(":::::::::::Json identidades crear:"+json);
             mediaType = MediaType.parse("application/application/json");
             body = RequestBody.create(mediaType, json);
-            String url = basePathS + pathIdentidadS;
+            String url = basePathProduccion + pathIdentidadS;
             request = new Request.Builder()
                     .url(url)
                     .method("POST", body)
@@ -193,7 +209,7 @@ public class ApisHttp {
             log.info("Json a enviar es:"+json);
             mediaType = MediaType.parse("application/application/json");
             body = RequestBody.create(mediaType, json);
-            String url = basePathS + pathCrearDocumentoS;
+            String url = basePathProduccion + pathCrearDocumentoS;
             request = new Request.Builder()
                     .url(url)
                     .method("POST", body)
@@ -239,7 +255,7 @@ public class ApisHttp {
             log.info("Json signers a enviar es:"+json);
             mediaType = MediaType.parse("application/application/json");
             body = RequestBody.create(mediaType, json);
-            String url = basePathS + pathEnviarFirmantes;
+            String url = basePathProduccion + pathEnviarFirmantes;
             request = new Request.Builder()
                     .url(url)
                     .method("POST", body)
@@ -265,5 +281,9 @@ public class ApisHttp {
 
         return resSignersVo;
     }
+
+
+
+
 
 }

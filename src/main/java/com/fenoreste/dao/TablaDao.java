@@ -9,4 +9,10 @@ public interface TablaDao extends JpaRepository<Tabla, TablaPK>{
 
     @Query(value = "SELECT * FROM tablas WHERE idtabla='digitalizacion' AND dato1=?1 LIMIT 1",nativeQuery = true)
     public Tabla TablaPorIdProducto(String dato1);
+
+
+    @Query(value = "SELECT * FROM tablas WHERE idtabla='digitalizacion' AND ?1 = ANY (string_to_array(dato1, '|'))",nativeQuery = true)
+    public Tabla TablaPorIdProductoArray(String dato1);
+
+
 }

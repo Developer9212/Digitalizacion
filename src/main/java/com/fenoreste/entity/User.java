@@ -21,16 +21,6 @@ public class User implements Serializable{
 	@Temporal(TemporalType.DATE)
 	private Date create_at;
 	
-	@PrePersist 
-	public void prePersist() {
-		create_at = new Date();		
-		Random random = new Random();
-		int value = random.nextInt(50 + 1) +1;
-		id = value;
-		
-	}	
-
-	
 	private static final long serialVersionUID = 1L;
 	
 }

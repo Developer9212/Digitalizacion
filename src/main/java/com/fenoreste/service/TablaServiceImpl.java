@@ -28,4 +28,9 @@ public class TablaServiceImpl implements ITablaService{
 		return tablaDao.TablaPorIdProducto(String.valueOf(idProducto));
 	}
 
+	@Override
+	public Tabla buscarPorIdProductoArray(Integer idProducto) {
+		return tablaDao.TablaPorIdProductoArray(String.valueOf(idProducto));
+	}
+
 }

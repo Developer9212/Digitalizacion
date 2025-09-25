@@ -16,3 +16,10 @@ INSERT INTO TABLAS(idtabla,idelemento,nombre,dato1,dato2) VALUES('digitalizacion
 
 DELETE FROM TABLAS WHERE idtabla='digitalizacion' AND idelemento ='contrato_aniversario';
 INSERT INTO TABLAS(idtabla,idelemento,dato1,dato2)VALUES('digitalizacion','contrato_aniversario','32644','67eadea8c046bd05d01058b2');
+
+DELETE FROM TABLAS WHERE idtabla='digitalizacion' AND idelemento='maximo_en_solicitud';
+INSERT INTO TABLAS(idtabla,idelemento,dato1)VALUES('digitalizacion','maximo_en_solicitud','50000');
+
+
+DELETE FROM TABLAS WHERE idtabla='digitalizacion' AND idelemento='capital_en_riesgo';
+INSERT INTO TABLAS(idtabla,idelemento,dato1,dato2)VALUES('digitalizacion','capital_en_riesgo','110','50000');

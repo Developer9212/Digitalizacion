@@ -9,6 +9,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Date;
 import java.util.List;
 
 @RestController
@@ -34,7 +35,8 @@ public class UserController {
 	@PostMapping("/create_user")
 	public ResponseEntity<?>crearUsuario(@RequestBody User user){
 		user.setPassword(bCryptPasswordEncoder.encode(user.getPassword()));
-		user.setId(1);
+		user.setId(user.getId());
+		user.setCreate_at(new Date());
 		this.userSevice.save(user);
 		return new ResponseEntity<>(HttpStatus.CREATED);
 		

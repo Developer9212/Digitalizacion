@@ -10,4 +10,6 @@ public interface ITablaService {
 	public void insertar(Tabla tabla);
 
 	public Tabla buscarPorIdProducto(Integer idProducto);
+
+	public Tabla buscarPorIdProductoArray(Integer idProducto);
 }

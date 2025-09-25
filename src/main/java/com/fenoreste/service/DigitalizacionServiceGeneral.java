@@ -89,7 +89,7 @@ public class DigitalizacionServiceGeneral {
                     SignerReqVo signer = new SignerReqVo();
                     signer.setEmail(correo);//persona.getEmail());
                     signer.setPhone(persona.getCelular());
-                    signer.setFullname(persona.getNombre() + " " + persona.getAppaterno() + " " + persona.getAppaterno());
+                    signer.setFullname(persona.getNombre() + " " + persona.getAppaterno() + " " + persona.getApmaterno());
                     signer.setStatus("pending");
                     signer.setStatus_identity("active");
                     signer.setFlow_id(tabla.getDato3());
@@ -137,7 +137,7 @@ public class DigitalizacionServiceGeneral {
 
                         signerCodeudor.setEmail(persona.getEmail());
                         signerCodeudor.setPhone(persona.getCelular());
-                        signerCodeudor.setFullname(persona.getNombre() + " " + persona.getAppaterno() + " " + persona.getAppaterno());
+                        signerCodeudor.setFullname(persona.getNombre() + " " + persona.getAppaterno() + " " + persona.getApmaterno());
                         signerCodeudor.setStatus("pending");
                         signerCodeudor.setStatus_identity("active");
                         signerCodeudor.setFlow_id(tabla.getDato3());
@@ -153,7 +153,7 @@ public class DigitalizacionServiceGeneral {
 
                         signerAval1.setEmail(persona.getEmail());
                         signerAval1.setPhone(persona.getCelular());
-                        signerAval1.setFullname(persona.getNombre() + " " + persona.getAppaterno() + " " + persona.getAppaterno());
+                        signerAval1.setFullname(persona.getNombre() + " " + persona.getAppaterno() + " " + persona.getApmaterno());
                         signerAval1.setStatus("pending");
                         signerAval1.setStatus_identity("active");
                         signerAval1.setFlow_id(tabla.getDato3());
@@ -169,7 +169,7 @@ public class DigitalizacionServiceGeneral {
 
                         signerAval2.setEmail(persona.getEmail());
                         signerAval2.setPhone(persona.getCelular());
-                        signerAval2.setFullname(persona.getNombre() + " " + persona.getAppaterno() + " " + persona.getAppaterno());
+                        signerAval2.setFullname(persona.getNombre() + " " + persona.getAppaterno() + " " + persona.getApmaterno());
                         signerAval2.setStatus("pending");
                         signerAval2.setStatus_identity("active");
                         signerAval2.setFlow_id(tabla.getDato3());
@@ -185,7 +185,7 @@ public class DigitalizacionServiceGeneral {
 
                         signerAval3.setEmail(persona.getEmail());
                         signerAval3.setPhone(persona.getCelular());
-                        signerAval3.setFullname(persona.getNombre() + " " + persona.getAppaterno() + " " + persona.getAppaterno());
+                        signerAval3.setFullname(persona.getNombre() + " " + persona.getAppaterno() + " " + persona.getApmaterno());
                         signerAval3.setStatus("pending");
                         signerAval3.setStatus_identity("active");
                         signerAval3.setFlow_id(tabla.getDato3());
@@ -238,73 +238,95 @@ public class DigitalizacionServiceGeneral {
             Auxiliar a = auxiliarService.buscarPorId(auxiliarPK);
             log.info(":::::Estatus opa:" + a.getEstatus());
             if (a != null) {
-                if (a.getEstatus() == 1) {
-                    List<List<Map<String, Object>>> sequence1 = new ArrayList<>();
-                    //Si esta el auxiliar ahora buscamos que esten las variables listas para el contrato
-                    List<FormatoDigital> formatos = formatoDigitalService.buscarListaPorId(auxiliarPK);
-                    if (formatos.size() > 0) {
-                        //Ya nos aseguramos que ya esten las variables en la tabla ahora si creamos la identidad
-                        //Antes llenamos la tabla para preparar respuestas de legalario
 
-                        digitalDoc.setAuxiliarPK(a.getPk());
-                        digitalDoc.setFecha_captura(new Date());
-                        digitalDoc.setStatus("Pendiente");
-                        digitalDoc.setFirmado(false);
-                        digitalDoc.setOk_identidad(false);
 
-                        digitalDocService.insertarDigitalDoc(digitalDoc);
+                tablaPK = new TablaPK(idTabla, "capital_en_riesgo");
+                tabla = tablaService.buscarPorId(tablaPK);
+                log.info("::::::::::::Monto aut:" + a.getMontoautorizado() + ",Capital en riesgo:" + tabla.getDato2());
 
-                        //Una ves guardado el registros enviamos la creacion de identidad
-                        Persona p = new Persona();
-                        PersonaPK personaPK = new PersonaPK(a.getIdorigen(), a.getIdgrupo(), a.getIdsocio());
-                        Persona persona = personaService.buscarPorId(personaPK);
+                //Buscamos el producto para tomar capital en riesgo
+                PersonaPK personaPK = new PersonaPK(a.getIdorigen(), a.getIdgrupo(), a.getIdsocio());
+                Auxiliar ahorro = auxiliarService.buscarPorOgsyProducto(personaPK, Integer.parseInt(tabla.getDato1()));
 
-                        String ogs = util.ogs(persona.getPk());
-                        //Consumimos metodo de crear Identidad
-                        IdentidadVoResponse identidadVoResponse = identidadCrear(ogs, opa);
+                if (ahorro != null) {
+                    //Calculamos el capital en riesgo
+                    Double capitalEnRiesgo = a.getMontoautorizado().doubleValue() - ahorro.getSaldo().doubleValue();
 
-                        ObjectMapper mapper = new ObjectMapper();
-                        JsonNode dataArray = mapper.valueToTree(identidadVoResponse.getData());
+                    if(capitalEnRiesgo <= Double.parseDouble(tabla.getDato2())){
+                            if (a.getEstatus() == 1) {
+                                List<List<Map<String, Object>>> sequence1 = new ArrayList<>();
+                                //Si esta el auxiliar ahora buscamos que esten las variables listas para el contrato
+                                List<FormatoDigital> formatos = formatoDigitalService.buscarListaPorId(auxiliarPK);
+                                if (formatos.size() > 0) {
+                                    //Ya nos aseguramos que ya esten las variables en la tabla ahora si creamos la identidad
+                                    //Antes llenamos la tabla para preparar respuestas de legalario
 
-                        if (identidadVoResponse.isSuccess()) {
-                            digitalDoc = digitalDocService.buscarDigitalDocPorId(a.getPk());
-                            JsonNode firstElement = dataArray.get(0);
-                            String id = firstElement.get("_id").asText();
-                            digitalDoc.setTidentidades(identidadVoResponse.getData().size());
-                            digitalDoc.setMensajeFinal("Identidad creada:" + new Date());
-                            digitalDocService.insertarDigitalDoc(digitalDoc);
+                                    digitalDoc.setAuxiliarPK(a.getPk());
+                                    digitalDoc.setFecha_captura(new Date());
+                                    digitalDoc.setStatus("Pendiente");
+                                    digitalDoc.setFirmado(false);
+                                    digitalDoc.setOk_identidad(false);
 
-                            String identidades = "";
-                            for (int i = 0; i < identidadVoResponse.getData().size(); i++) {
-                                IdentidadCreada identidadCreada = new IdentidadCreada();
-                                JsonNode dataArray1 = mapper.valueToTree(identidadVoResponse.getData());
-                                JsonNode firstElement1 = dataArray1.get(i);
-                                String id1 = firstElement1.get("_id").asText();
-                                identidadCreada.setIdorigenp(auxiliarPK.getIdorigenp());
-                                identidadCreada.setIdproducto(auxiliarPK.getIdproducto());
-                                identidadCreada.setIdauxiliar(auxiliarPK.getIdauxiliar());
-                                identidadCreada.setFecha_creada(new Date());
-                                identidadCreada.setIdidentidad(id1);
-                                identidadCreada.setConfirmada(false);
-                                identidadService.guardar(identidadCreada);
-                                identidades = identidades + id1 + "|";
-                            }
+                                    digitalDocService.insertarDigitalDoc(digitalDoc);
+                                    //Una ves guardado el registros enviamos la creacion de identidad
+                                    Persona persona = personaService.buscarPorId(personaPK);
+                                    String ogs = util.ogs(persona.getPk());
+                                    //Consumimos metodo de crear Identidad
+                                    IdentidadVoResponse identidadVoResponse = identidadCrear(ogs, opa);
 
-                            log.info("::::::::::Se envio la identidad::::::::::::");
-                            resp.setSuccess(true);
-                            resp.setMessage("Identidad creada con exito:" + identidades);
-                        } else {
-                            log.error(":::::::::::::::::::::" + identidadVoResponse.getMessage() + ":::::::::::::::::::");
-                            digitalDoc.setMensajeFinal(identidadVoResponse.getMessage() + ":" + new Date());
-                            digitalDocService.insertarDigitalDoc(digitalDoc);
-                            resp.setSuccess(false);
-                            resp.setMessage(identidadVoResponse.getMessage());
+                                    ObjectMapper mapper = new ObjectMapper();
+                                    JsonNode dataArray = mapper.valueToTree(identidadVoResponse.getData());
+
+                                    if (identidadVoResponse.isSuccess()) {
+                                        digitalDoc = digitalDocService.buscarDigitalDocPorId(a.getPk());
+                                        JsonNode firstElement = dataArray.get(0);
+                                        String id = firstElement.get("_id").asText();
+                                        digitalDoc.setTidentidades(identidadVoResponse.getData().size());
+                                        digitalDoc.setMensajeFinal("Identidad creada:" + new Date());
+                                        digitalDocService.insertarDigitalDoc(digitalDoc);
+
+                                        String identidades = "";
+                                        for (int i = 0; i < identidadVoResponse.getData().size(); i++) {
+                                            IdentidadCreada identidadCreada = new IdentidadCreada();
+                                            JsonNode dataArray1 = mapper.valueToTree(identidadVoResponse.getData());
+                                            JsonNode firstElement1 = dataArray1.get(i);
+                                            String id1 = firstElement1.get("_id").asText();
+                                            identidadCreada.setIdorigenp(auxiliarPK.getIdorigenp());
+                                            identidadCreada.setIdproducto(auxiliarPK.getIdproducto());
+                                            identidadCreada.setIdauxiliar(auxiliarPK.getIdauxiliar());
+                                            identidadCreada.setFecha_creada(new Date());
+                                            identidadCreada.setIdidentidad(id1);
+                                            identidadCreada.setConfirmada(false);
+                                            identidadService.guardar(identidadCreada);
+                                            identidades = identidades + id1 + "|";
+                                        }
+
+                                        log.info("::::::::::Se envio la identidad::::::::::::");
+                                        resp.setSuccess(true);
+                                        resp.setMessage("Identidad creada con exito:" + identidades);
+                                    } else {
+                                        log.error(":::::::::::::::::::::" + identidadVoResponse.getMessage() + ":::::::::::::::::::");
+                                        digitalDoc.setMensajeFinal(identidadVoResponse.getMessage() + ":" + new Date());
+                                        digitalDocService.insertarDigitalDoc(digitalDoc);
+                                        resp.setSuccess(false);
+                                        resp.setMessage(identidadVoResponse.getMessage());
+                                    }
+                                }
+                            } else {
+                                log.info("::::::::::::::Estatus folio debe ser autorizado:::::::::::::");
+                                resp.setMessage("Estatus folio debe ser autorizado");
+
                         }
+                    } else {
+                        log.info("::::::::::::::Monto en solicitud debe ser <= " + tabla.getDato2() + ":::::::::::::");
+                        resp.setMessage("Monto en solicitud debe ser <= " + tabla.getDato2());
                     }
-                } else {
-                    log.info("::::::::::::::Estatus folio debe ser capturado:::::::::::::");
-                    resp.setMessage("Estatus folio debe ser capturado:");
+
+                }else{
+                    log.info("::::::::::::::Producto para validacion de capital en riesgo no configurado o estatus no valido: " + tabla.getDato1() + ":::::::::::::");
+                    resp.setMessage("Producto para validacion de capital en riesgo no configurado: " + tabla.getDato1());
                 }
+
             } else {
                 log.info(":::::::::::::::No existe folio capturado::::::::::::::::");
                 resp.setMessage("El folio no existe");
@@ -375,7 +397,7 @@ public class DigitalizacionServiceGeneral {
                             boolean banderaDatos = false;
 
 
-                            tabla = tablaService.buscarPorIdProducto(aPk.getIdproducto());
+                            tabla = tablaService.buscarPorIdProductoArray(aPk.getIdproducto());
                             Auxiliar a = auxiliarService.buscarPorId(digitalDoc.getAuxiliarPK());
                             PersonaPK personaPK = new PersonaPK(a.getIdorigen(), a.getIdgrupo(), a.getIdsocio());
                             Persona p = personaService.buscarPorId(personaPK);
@@ -574,6 +596,7 @@ public class DigitalizacionServiceGeneral {
                     OgsVo ogsVo = new OgsVo();
 
                     if (!persona.getEmail().isEmpty()) {
+                        log.info("::::::Correo socio:" + persona.getEmail());
                         signer.setEmail(persona.getEmail().trim());
                         signer.setFullname(persona.getNombre() + " " + persona.getAppaterno() + " " + persona.getApmaterno());
                         signer.setRole("FIRMANTE");
@@ -585,6 +608,7 @@ public class DigitalizacionServiceGeneral {
                         ogsVo = util.ogs(ogsCodeudor);
                         personaPK = new PersonaPK(ogsVo.getIdorigen(), ogsVo.getIdgrupo(), ogsVo.getIdsocio());
                         persona = personaService.buscarPorId(personaPK);
+                        log.info(":::::Ogs codeudor:" + persona.getPk().getIdorigen() + "-" + persona.getPk().getIdgrupo() + "-" + persona.getPk().getIdsocio() + ",correo:" + persona.getEmail());
                         Signer signer1 = new Signer();
                         signer1.setEmail(persona.getEmail());
                         signer1.setFullname(persona.getNombre() + " " + persona.getAppaterno() + " " + persona.getApmaterno());
@@ -594,10 +618,11 @@ public class DigitalizacionServiceGeneral {
                     }
 
                     if (!ogsAval1.isEmpty()) {
-                        log.info(":::::::::::::::::::Aval 1 ogs:" + ogsAval1);
+
                         ogsVo = util.ogs(ogsAval1);
                         personaPK = new PersonaPK(ogsVo.getIdorigen(), ogsVo.getIdgrupo(), ogsVo.getIdsocio());
                         persona = personaService.buscarPorId(personaPK);
+                        log.info(":::::Ogs aval1:" + persona.getPk().getIdorigen() + "-" + persona.getPk().getIdgrupo() + "-" + persona.getPk().getIdsocio() + ",correo:" + persona.getEmail());
                         Signer signer2 = new Signer();
                         signer2.setEmail(persona.getEmail());
                         signer2.setFullname(persona.getNombre() + " " + persona.getAppaterno() + " " + persona.getApmaterno());
@@ -610,6 +635,7 @@ public class DigitalizacionServiceGeneral {
                         ogsVo = util.ogs(ogsAval2);
                         personaPK = new PersonaPK(ogsVo.getIdorigen(), ogsVo.getIdgrupo(), ogsVo.getIdsocio());
                         persona = personaService.buscarPorId(personaPK);
+                        log.info(":::::Ogs aval 2:" + persona.getPk().getIdorigen() + "-" + persona.getPk().getIdgrupo() + "-" + persona.getPk().getIdsocio() + ",correo:" + persona.getEmail());
                         Signer signer3 = new Signer();
                         signer3.setEmail(persona.getEmail());
                         signer3.setFullname(persona.getNombre() + " " + persona.getAppaterno() + " " + persona.getApmaterno());
@@ -622,6 +648,7 @@ public class DigitalizacionServiceGeneral {
                         ogsVo = util.ogs(ogsAval3);
                         personaPK = new PersonaPK(ogsVo.getIdorigen(), ogsVo.getIdgrupo(), ogsVo.getIdsocio());
                         persona = personaService.buscarPorId(personaPK);
+                        log.info(":::::Ogs aval 3:" + persona.getPk().getIdorigen() + "-" + persona.getPk().getIdgrupo() + "-" + persona.getPk().getIdsocio() + ",correo:" + persona.getEmail());
                         Signer signer4 = new Signer();
                         signer4.setEmail(persona.getEmail());
                         signer4.setFullname(persona.getNombre() + " " + persona.getAppaterno() + " " + persona.getApmaterno());
@@ -635,7 +662,7 @@ public class DigitalizacionServiceGeneral {
                     if (!signersReqVo.getSigners().isEmpty()) {
                         signersReqVo.setSigners(signers);
                         log.info("::::::::::::Vamos a enviar a firmantes:::::::::::::::");
-                        System.out.println(":::::::Tu peticion:::" + signersReqVo);
+                        System.out.println(":::::::Tu peticion enviar firmantes:::" + signersReqVo);
                         signersReqVo.setSend_invite(true);
                         ResSignersVo signerResVo = apisHttp.firmantes(signersReqVo);
                         resSignersVo.setMessage(signerResVo.getMessage());
@@ -720,6 +747,7 @@ public class DigitalizacionServiceGeneral {
                         token = tabla.getDato2();
                     } else {
                         log.info(":::::::token vencido hay que generar otro");
+
                         LoginVoResponse loginVoResponse = apisHttp.login();
                         token = apisHttp.token(loginVoResponse.getClientId(), loginVoResponse.getClientSecret());
                     }
