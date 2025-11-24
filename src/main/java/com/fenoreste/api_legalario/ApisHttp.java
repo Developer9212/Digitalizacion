@@ -27,7 +27,7 @@ import java.time.format.DateTimeFormatter;
 public class ApisHttp {
 
     /*Produccion*/
-    private String basePathProduccion = "https://api.legalario.com/";
+    private String basePathProduccions = "https://api.legalario.com/";
 
 
     //Sandbox Testing
@@ -76,17 +76,26 @@ public class ApisHttp {
                     .build();
 
 
-            log.info("::::::::::::::::::::::Pasandoooooooooooooooooooooo a consumir login:::::::::::::::");
             mediaType = MediaType.parse("application/x-www-form-urlencoded");
 
-            //body = RequestBody.create(mediaType, "email=ctello@csn.coop"+tabla.getDato2()+"&password=cjAs6L09Jqlh";//+tabla.getDato1());
+            body = RequestBody.create(mediaType, "email="+tabla.getDato2()+"&password="+tabla.getDato1());
 
-            body = RequestBody.create(mediaType, "email=ctello@csn.coop&password=cjAs6L09Jqlh");//+tabla.getDato1());
+           // body = RequestBody.create(mediaType, "email=ctello@csn.coop&password=cjAs6L09Jqlh");//+tabla.getDato1());
             log.info(":::::::::::::::::::Body:"+body);
 
-            log.info(":::::::::::::::::::::::Datos login:::::::::::::"+tabla.getDato1()+","+tabla.getDato2());
+            tablaPK = new TablaPK("digitalizacion", "ambiente");
+            tabla = tablaService.buscarPorId(tablaPK);
 
-            String url = basePathProduccion + pathLoginS;
+            String ambiente = "";
+            if(tabla.getDato1().equals("demo")){
+                ambiente = basePathSandbox;
+            } else if(tabla.getDato1().equals("prod")){
+                ambiente = basePathProduccions;
+            }
+
+            String url = ambiente + pathLoginS;
+
+            log.warn(":::::::::Url a consumir:"+url);
             request = new Request.Builder()
                     .url(url)
                     .method("POST", body).addHeader("Content-Type", "application/x-www-form-urlencoded").build();
@@ -107,7 +116,7 @@ public class ApisHttp {
     }
 
 
-    public String token(String clientId, String clientSecret) {
+    public String token() {
         String resultado = "";
 
         try {
@@ -117,11 +126,27 @@ public class ApisHttp {
                     .connectTimeout(20, java.util.concurrent.TimeUnit.SECONDS) // Tiempo de espera para establecer la conexión
                     .readTimeout(20, java.util.concurrent.TimeUnit.SECONDS)    // Tiempo de espera para la lectura de datos
                     .build();
-            mediaType = MediaType.parse("application/x-www-form-urlencoded");
-            body = RequestBody.create(mediaType, "client_id=" + clientId +
-                    "&client_secret=" + clientSecret + "&grant_type=client_credentials&scope=customers");
 
-            String url = basePathProduccion + pathTokenS;
+            //Se consume directo metodo para loguear
+            LoginVoResponse loginVoResponse = login();
+
+            mediaType = MediaType.parse("application/x-www-form-urlencoded");
+            body = RequestBody.create(mediaType, "client_id=" + loginVoResponse.getClientId() +
+                    "&client_secret=" + loginVoResponse.getClientSecret() + "&grant_type=client_credentials&scope=csn");//Se cambia scope el 06/11/2025
+
+            tablaPK = new TablaPK("digitalizacion", "ambiente");
+            tabla = tablaService.buscarPorId(tablaPK);
+
+            String ambiente = "";
+            if(tabla.getDato1().equals("demo")){
+                ambiente = basePathSandbox;
+            } else if(tabla.getDato1().equals("prod")){
+                ambiente = basePathProduccions;
+            }
+
+
+            String url = ambiente + pathTokenS;
+            log.warn(":::::::::Url a consumir:"+url);
             request = new Request.Builder()
                     .url(url)
                     .method("POST", body).addHeader("Content-Type", "application/x-www-form-urlencoded").build();
@@ -158,8 +183,11 @@ public class ApisHttp {
         String resultado = "";
         IdentidadVoResponse identidadVoResponse = new IdentidadVoResponse();
         try {
-            tablaPK = new TablaPK("digitalizacion", "token");
-            tabla = tablaService.buscarPorId(tablaPK);
+            /*tablaPK = new TablaPK("digitalizacion", "token");
+            //tabla = tablaService.buscarPorId(tablaPK);
+            String token = tabla.getDato2().trim();*///Bloque comentado el 06/11/2025 por cambio en es scope y tiempo de token
+
+            String token = token();
             sslUtil.disableSSLCertificateChecking();
             client = new OkHttpClient.Builder()
                     .connectTimeout(220, java.util.concurrent.TimeUnit.SECONDS) // Tiempo de espera para establecer la conexión
@@ -169,12 +197,24 @@ public class ApisHttp {
             log.info(":::::::::::Json identidades crear:"+json);
             mediaType = MediaType.parse("application/application/json");
             body = RequestBody.create(mediaType, json);
-            String url = basePathProduccion + pathIdentidadS;
+
+            tablaPK = new TablaPK("digitalizacion", "ambiente");
+            tabla = tablaService.buscarPorId(tablaPK);
+
+            String ambiente = "";
+            if(tabla.getDato1().equals("demo")){
+                ambiente = basePathSandbox;
+            } else if(tabla.getDato1().equals("prod")){
+                ambiente = basePathProduccions;
+            }
+
+            String url = ambiente + pathIdentidadS;
+            log.warn(":::::::::Url a consumir:"+url);
             request = new Request.Builder()
                     .url(url)
                     .method("POST", body)
                     .addHeader("Content-Type", "application/json")
-                    .addHeader("Authorization", "Bearer " + tabla.getDato2())
+                    .addHeader("Authorization", "Bearer " + token)
                     .build();
 
             response = client.newCall(request).execute();
@@ -197,8 +237,10 @@ public class ApisHttp {
         String resultado = "";
         ResCreaDocumentoVo creaDocumentoVo = new ResCreaDocumentoVo();
         try {
-            tablaPK = new TablaPK("digitalizacion", "token");
-            tabla = tablaService.buscarPorId(tablaPK);
+            /*tablaPK = new TablaPK("digitalizacion", "token");
+            tabla = tablaService.buscarPorId(tablaPK);*/
+            String token = token();
+
             sslUtil.disableSSLCertificateChecking();
             client = new OkHttpClient.Builder()
                     .connectTimeout(220, java.util.concurrent.TimeUnit.SECONDS) // Tiempo de espera para establecer la conexión
@@ -209,12 +251,24 @@ public class ApisHttp {
             log.info("Json a enviar es:"+json);
             mediaType = MediaType.parse("application/application/json");
             body = RequestBody.create(mediaType, json);
-            String url = basePathProduccion + pathCrearDocumentoS;
+
+            tablaPK = new TablaPK("digitalizacion", "ambiente");
+            tabla = tablaService.buscarPorId(tablaPK);
+
+            String ambiente = "";
+            if(tabla.getDato1().equals("demo")){
+                ambiente = basePathSandbox;
+            } else if(tabla.getDato1().equals("prod")){
+                ambiente = basePathProduccions;
+            }
+
+            String url = ambiente + pathCrearDocumentoS;
+            log.warn(":::::::::Url a consumir:"+url);
             request = new Request.Builder()
                     .url(url)
                     .method("POST", body)
                     .addHeader("Content-Type", "application/json")
-                    .addHeader("Authorization", "Bearer " + tabla.getDato2())
+                    .addHeader("Authorization", "Bearer " + token)
                     .build();
 
             response = client.newCall(request).execute();
@@ -249,18 +303,31 @@ public class ApisHttp {
                     .build();
             String json = mapper.writeValueAsString(signersVoReq);
 
-            tablaPK = new TablaPK("digitalizacion", "token");
+            /*tablaPK = new TablaPK("digitalizacion", "token");
             tabla = tablaService.buscarPorId(tablaPK);
-
+            String token = tabla.getDato2().trim();*/
+            String token = token();
             log.info("Json signers a enviar es:"+json);
             mediaType = MediaType.parse("application/application/json");
             body = RequestBody.create(mediaType, json);
-            String url = basePathProduccion + pathEnviarFirmantes;
+
+            tablaPK = new TablaPK("digitalizacion", "ambiente");
+            tabla = tablaService.buscarPorId(tablaPK);
+
+            String ambiente = "";
+            if(tabla.getDato1().equals("demo")){
+                ambiente = basePathSandbox;
+            } else if(tabla.getDato1().equals("prod")){
+                ambiente = basePathProduccions;
+            }
+
+
+            String url = ambiente + pathEnviarFirmantes;
             request = new Request.Builder()
                     .url(url)
                     .method("POST", body)
                     .addHeader("Content-Type", "application/json")
-                    .addHeader("Authorization", "Bearer " + tabla.getDato2())
+                    .addHeader("Authorization", "Bearer " + token)
                     .build();
 
             response = client.newCall(request).execute();
@@ -281,8 +348,6 @@ public class ApisHttp {
 
         return resSignersVo;
     }
-
-
 
 
 

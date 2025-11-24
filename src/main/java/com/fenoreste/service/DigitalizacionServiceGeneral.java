@@ -201,12 +201,12 @@ public class DigitalizacionServiceGeneral {
                     tabla = tablaService.buscarPorId(tablaPK);
 
                     if (tabla != null) {
-                        token();
+                        //token();
                         identidadVoResponse = apisHttp.identidadCrear(signersVoReq);
-                        if (!identidadVoResponse.isSuccess() && identidadVoResponse.getMessage().contains("AUTHORIZATION_ERROR")) {
+                        /*if (!identidadVoResponse.isSuccess() && identidadVoResponse.getMessage().contains("AUTHORIZATION_ERROR")) {
                             token();
                             identidadVoResponse = apisHttp.identidadCrear(signersVoReq);
-                        }
+                        }*///bloque comentado el 06/11/2025 porque cambia scope y vencimiento de token
 
 
                     } else {
@@ -226,7 +226,7 @@ public class DigitalizacionServiceGeneral {
         return identidadVoResponse;
     }
 
-
+    //Metodo llamado desde SAICoop
     public ResCreaDocumentoVo resCreaDocumentoVo(String opa) {
         ResCreaDocumentoVo resp = new ResCreaDocumentoVo();
         DigitalDoc digitalDoc = new DigitalDoc();
@@ -238,8 +238,6 @@ public class DigitalizacionServiceGeneral {
             Auxiliar a = auxiliarService.buscarPorId(auxiliarPK);
             log.info(":::::Estatus opa:" + a.getEstatus());
             if (a != null) {
-
-
                 tablaPK = new TablaPK(idTabla, "capital_en_riesgo");
                 tabla = tablaService.buscarPorId(tablaPK);
                 log.info("::::::::::::Monto aut:" + a.getMontoautorizado() + ",Capital en riesgo:" + tabla.getDato2());
@@ -258,59 +256,88 @@ public class DigitalizacionServiceGeneral {
                                 //Si esta el auxiliar ahora buscamos que esten las variables listas para el contrato
                                 List<FormatoDigital> formatos = formatoDigitalService.buscarListaPorId(auxiliarPK);
                                 if (formatos.size() > 0) {
+
                                     //Ya nos aseguramos que ya esten las variables en la tabla ahora si creamos la identidad
                                     //Antes llenamos la tabla para preparar respuestas de legalario
-
                                     digitalDoc.setAuxiliarPK(a.getPk());
                                     digitalDoc.setFecha_captura(new Date());
                                     digitalDoc.setStatus("Pendiente");
                                     digitalDoc.setFirmado(false);
                                     digitalDoc.setOk_identidad(false);
 
-                                    digitalDocService.insertarDigitalDoc(digitalDoc);
                                     //Una ves guardado el registros enviamos la creacion de identidad
                                     Persona persona = personaService.buscarPorId(personaPK);
                                     String ogs = util.ogs(persona.getPk());
-                                    //Consumimos metodo de crear Identidad
-                                    IdentidadVoResponse identidadVoResponse = identidadCrear(ogs, opa);
 
-                                    ObjectMapper mapper = new ObjectMapper();
-                                    JsonNode dataArray = mapper.valueToTree(identidadVoResponse.getData());
-
-                                    if (identidadVoResponse.isSuccess()) {
-                                        digitalDoc = digitalDocService.buscarDigitalDocPorId(a.getPk());
-                                        JsonNode firstElement = dataArray.get(0);
-                                        String id = firstElement.get("_id").asText();
-                                        digitalDoc.setTidentidades(identidadVoResponse.getData().size());
-                                        digitalDoc.setMensajeFinal("Identidad creada:" + new Date());
-                                        digitalDocService.insertarDigitalDoc(digitalDoc);
-
-                                        String identidades = "";
-                                        for (int i = 0; i < identidadVoResponse.getData().size(); i++) {
-                                            IdentidadCreada identidadCreada = new IdentidadCreada();
-                                            JsonNode dataArray1 = mapper.valueToTree(identidadVoResponse.getData());
-                                            JsonNode firstElement1 = dataArray1.get(i);
-                                            String id1 = firstElement1.get("_id").asText();
-                                            identidadCreada.setIdorigenp(auxiliarPK.getIdorigenp());
-                                            identidadCreada.setIdproducto(auxiliarPK.getIdproducto());
-                                            identidadCreada.setIdauxiliar(auxiliarPK.getIdauxiliar());
-                                            identidadCreada.setFecha_creada(new Date());
-                                            identidadCreada.setIdidentidad(id1);
-                                            identidadCreada.setConfirmada(false);
-                                            identidadService.guardar(identidadCreada);
-                                            identidades = identidades + id1 + "|";
+                                    /*Corremos la lista de formatos digitales datos solo para asegurarnos que quien elaboro no sea
+                                    la misma persona que autorizo*/
+                                    boolean banderaAutorizacion = false;
+                                    String autorizo = "";
+                                    String elaboro="";
+                                    for(int i =0;i< formatos.size();i++){
+                                        FormatoDigital formato = formatos.get(i);
+                                         if(formato.getEtiqueta().trim().replace(">","").replace("<","").replace("|","").equalsIgnoreCase("elaboro")){
+                                                elaboro = formato.getValor().trim();
+                                        }
+                                        if(formato.getEtiqueta().trim().replace(">","").replace("<","").replace("|","").equalsIgnoreCase("autorizo")){
+                                            autorizo = formato.getValor().trim();
+                                        }
+                                        if(!elaboro.isEmpty() && !autorizo.isEmpty()){
+                                            break;
                                         }
 
-                                        log.info("::::::::::Se envio la identidad::::::::::::");
-                                        resp.setSuccess(true);
-                                        resp.setMessage("Identidad creada con exito:" + identidades);
-                                    } else {
-                                        log.error(":::::::::::::::::::::" + identidadVoResponse.getMessage() + ":::::::::::::::::::");
-                                        digitalDoc.setMensajeFinal(identidadVoResponse.getMessage() + ":" + new Date());
-                                        digitalDocService.insertarDigitalDoc(digitalDoc);
-                                        resp.setSuccess(false);
-                                        resp.setMessage(identidadVoResponse.getMessage());
                                     }
+                                    if (!elaboro.trim().equalsIgnoreCase(autorizo.trim())) {
+                                        digitalDocService.insertarDigitalDoc(digitalDoc);
+                                        banderaAutorizacion = true;
+                                    }
+
+                                    if(banderaAutorizacion){
+                                        //Consumimos metodo de crear Identidad
+                                        IdentidadVoResponse identidadVoResponse = identidadCrear(ogs, opa);
+
+                                        ObjectMapper mapper = new ObjectMapper();
+                                        JsonNode dataArray = mapper.valueToTree(identidadVoResponse.getData());
+
+                                        if (identidadVoResponse.isSuccess()) {
+                                            digitalDoc = digitalDocService.buscarDigitalDocPorId(a.getPk());
+                                            JsonNode firstElement = dataArray.get(0);
+                                            String id = firstElement.get("_id").asText();
+                                            digitalDoc.setTidentidades(identidadVoResponse.getData().size());
+                                            digitalDoc.setMensajeFinal("Identidad creada:" + new Date());
+                                            digitalDocService.insertarDigitalDoc(digitalDoc);
+
+                                            String identidades = "";
+                                            for (int i = 0; i < identidadVoResponse.getData().size(); i++) {
+                                                IdentidadCreada identidadCreada = new IdentidadCreada();
+                                                JsonNode dataArray1 = mapper.valueToTree(identidadVoResponse.getData());
+                                                JsonNode firstElement1 = dataArray1.get(i);
+                                                String id1 = firstElement1.get("_id").asText();
+                                                identidadCreada.setIdorigenp(auxiliarPK.getIdorigenp());
+                                                identidadCreada.setIdproducto(auxiliarPK.getIdproducto());
+                                                identidadCreada.setIdauxiliar(auxiliarPK.getIdauxiliar());
+                                                identidadCreada.setFecha_creada(new Date());
+                                                identidadCreada.setIdidentidad(id1);
+                                                identidadCreada.setConfirmada(false);
+                                                identidadService.guardar(identidadCreada);
+                                                identidades = identidades + id1 + "|";
+                                            }
+
+                                            log.info("::::::::::Se envio la identidad::::::::::::");
+                                            resp.setSuccess(true);
+                                            resp.setMessage("Identidad creada con exito:" + identidades);
+                                        } else {
+                                            log.error(":::::::::::::::::::::" + identidadVoResponse.getMessage() + ":::::::::::::::::::");
+                                            digitalDoc.setMensajeFinal(identidadVoResponse.getMessage() + ":" + new Date());
+                                            digitalDocService.insertarDigitalDoc(digitalDoc);
+                                            resp.setSuccess(false);
+                                            resp.setMessage(identidadVoResponse.getMessage());
+                                        }
+                                    }else{
+                                        log.info("::::::::::::::Persona que elaboro no puede autorizar credito:::::::::::::");
+                                        resp.setMessage("Persona que elaboro no puede autorizar credito");
+                                    }
+
                                 }
                             } else {
                                 log.info("::::::::::::::Estatus folio debe ser autorizado:::::::::::::");
@@ -471,10 +498,10 @@ public class DigitalizacionServiceGeneral {
                                 crearDReqVo.setType("template");
                                 crearDReqVo.setSequence(sequence);
                                 ResCreaDocumentoVo resp = apisHttp.crearDocumento(crearDReqVo);
-                                if (!resp.isSuccess() && resp.getMessage().contains("AUTHORIZATION_ERROR")) {
+                                /*if (!resp.isSuccess() && resp.getMessage().contains("AUTHORIZATION_ERROR")) {
                                     token();
                                     resp = apisHttp.crearDocumento(crearDReqVo);
-                                }
+                                }*/
 
                                 log.info(":::::::::::::::::::::Se creo el documento::::::::::::::::::");
                                 //Una ves creado el documento actualizamos la tabla y enviamos a los firmantes
@@ -732,7 +759,7 @@ public class DigitalizacionServiceGeneral {
         return item;
     }
 
-    private String token() {
+    /*private String token() {
         String token = "";
         try {
             tablaPK = new TablaPK(idTabla, "token");
@@ -762,5 +789,5 @@ public class DigitalizacionServiceGeneral {
         }
 
         return token;
-    }
+    }*///Comentado el 06/11/2025 por cambio en scope y tiempo de token
 }

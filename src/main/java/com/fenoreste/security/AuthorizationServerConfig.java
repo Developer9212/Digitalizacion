@@ -34,7 +34,6 @@ public class AuthorizationServerConfig extends AuthorizationServerConfigurerAdap
 	public void configure(ClientDetailsServiceConfigurer clients) throws Exception{
 		TablaPK pk = new TablaPK("digitalizacion","user-ws");
 		Tabla tbSecurity = tablasService.buscarPorId(pk);
-		
 		clients.inMemory()
 		.withClient(tbSecurity.getDato1())
 		.secret(bCryptPasswordEncoder.encode(tbSecurity.getDato2()))

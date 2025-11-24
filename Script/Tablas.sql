@@ -23,3 +23,7 @@ INSERT INTO TABLAS(idtabla,idelemento,dato1)VALUES('digitalizacion','maximo_en_s
 
 DELETE FROM TABLAS WHERE idtabla='digitalizacion' AND idelemento='capital_en_riesgo';
 INSERT INTO TABLAS(idtabla,idelemento,dato1,dato2)VALUES('digitalizacion','capital_en_riesgo','110','50000');
+
+/*Para uso de ambiente demo o prod*/
+DELETE FROM TABLAS WHERE idtabla='digitalizacion' AND idelemento='ambiente';
+INSERT INTO TABLAS(idtabla,idelemento,dato1) VALUES('digitalizacion','ambiente','demo');

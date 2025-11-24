@@ -24,7 +24,7 @@ public class DigitalController {
 
     @GetMapping("/identidad-crear")
     private IdentidadVoResponse identidadCrear(@RequestHeader("usuario")String user,@RequestParam(name = "ogs") String ogs) {
-        log.info("ssssssssssssssss:"+user);
+
         return digitalizacionService.identidadCrear(ogs,"");
     }
 
